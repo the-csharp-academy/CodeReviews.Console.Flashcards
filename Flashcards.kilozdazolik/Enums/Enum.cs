@@ -3,6 +3,7 @@
 internal enum MenuAction
 {
     ViewAllStacks,
+    ViewFlashcards,
     ManageStacks,
     ManageFlashcards,
     Study,
@@ -10,7 +11,7 @@ internal enum MenuAction
     Exit
 }
 
-internal enum StackAction
+internal enum ActionType
 {
     Insert,
     Update,

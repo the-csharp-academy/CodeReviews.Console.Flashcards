@@ -1,6 +1,5 @@
 ﻿using Dapper;
 using Flashcards.kilozdazolik.Models;
-using Flashcards.kilozdazolik.Data;
 using Microsoft.Data.SqlClient;
 
 namespace Flashcards.kilozdazolik.Data;

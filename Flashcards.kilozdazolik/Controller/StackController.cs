@@ -7,6 +7,7 @@ namespace Flashcards.kilozdazolik.Controller;
 public class StackController
 {
     private StackRepository _stackRepository = new();
+    private Helper _helper = new();
 
     public void ViewAllStacks()
     {
@@ -70,24 +71,9 @@ public class StackController
 
     public void EditStack()
     {
-        var allStacks = _stackRepository.GetAllStacks();
-    
-        if (allStacks.Count == 0)
-        {
-            AnsiConsole.MarkupLine("[red]No stacks are available to edit.[/]");
-            Console.ReadKey();
-            return;
-        }
+        var stackToEdit = _helper.SelectStack(_stackRepository, "edit");
+        if (stackToEdit == null) return;
         
-        var stackToEdit = AnsiConsole.Prompt(
-            new SelectionPrompt<Stack>()
-                .Title("Select a [cyan]STACK[/] to edit:")
-                .UseConverter(s => $"{s.Name}")
-                .AddChoices(allStacks)
-        );
-
-        AnsiConsole.Clear();
-
         bool success = false;
         do
         {
@@ -122,6 +108,22 @@ public class StackController
         } while (!success);
     }
 
-    
-    public void DeleteStack() {}
+
+    public void DeleteStack()
+    {
+        var stackToDelete = _helper.SelectStack(_stackRepository, "delete");
+        if (stackToDelete == null) return;
+        
+        if (_helper.ConfirmMessage("Delete", stackToDelete.Name))
+        {
+            _stackRepository.DeleteStack(stackToDelete);
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("Deletion canceled.");
+        }
+        
+        AnsiConsole.MarkupLine("[green]Press Any Key to Continue.[/]");
+        Console.ReadKey();
+    }
 }
