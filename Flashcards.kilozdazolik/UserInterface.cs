@@ -53,6 +53,7 @@ public class UserInterface
                 _flashcardController.CreateFlashcard();
                 break;
             case ActionType.Update:
+                _flashcardController.EditFlashcard();
                 break;
             case ActionType.Delete:
                 break;

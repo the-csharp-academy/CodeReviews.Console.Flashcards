@@ -28,7 +28,12 @@ public class FlashcardRepository
         {
             using (var conn = Database.GetConnection())
             {
-                var sql = "SELECT * FROM dbo.flashcards WHERE stack_id = @StackId";
+                var sql = @"SELECT card_id AS CardId, 
+                               stack_id AS StackId, 
+                               front AS Front, 
+                               back AS Back 
+                        FROM dbo.flashcards 
+                        WHERE stack_id = @StackId";
                 var flashcards = conn.Query<Flashcard>(sql, new { StackId = stackId });
                 return flashcards.ToList();
             }
@@ -38,8 +43,35 @@ public class FlashcardRepository
             throw new Exception("Database operation failed", e);
         }
     }
-    
-    public void UpdateCard (Flashcard flashcard) {}
-    
-    public void DeleteCard (int cardId) {}
+
+    public void UpdateCard(Flashcard flashcard)
+    {
+        try
+        {
+            using (var conn = Database.GetConnection())
+            {
+                var sql = "UPDATE dbo.flashcards SET front = @Front, back = @Back, stack_id = @StackId WHERE card_id = @CardId";
+                conn.Execute(sql, new 
+                {
+                    Front = flashcard.Front,
+                    Back = flashcard.Back,
+                    StackId = flashcard.StackId,
+                    CardId = flashcard.CardId 
+                });
+            }
+        }
+        catch (SqlException ex) when (ex.Number == 2627) // duplicate key
+        {
+            throw new InvalidOperationException("A flashcard with this name already exists.", ex);
+        }
+        catch (SqlException e)
+        {
+            throw new Exception("Database operation failed", e);
+        }
+    }
+
+    public void DeleteCard(int cardId)
+    {
+        
+    }
 }

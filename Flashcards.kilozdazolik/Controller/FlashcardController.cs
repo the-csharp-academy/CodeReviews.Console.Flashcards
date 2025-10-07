@@ -10,6 +10,48 @@ public class FlashcardController
     private FlashcardRepository _flashcardRepository = new();
     private StackRepository _stackRepository = new();
     private Helper _helper = new();
+
+    public void DeleteFlashcard()
+    {
+        
+    }
+    
+    public void EditFlashcard()
+    {
+        var stack = _helper.SelectStack(_stackRepository, "select");
+        var flashCards = _flashcardRepository.GetCardsByStack(stack.StackId);
+    
+        // Let user select directly from Flashcard objects
+        var selectedFlashcard = AnsiConsole.Prompt(
+            new SelectionPrompt<Flashcard>()
+                .Title("Select a [cyan]FLASHCARD[/]:")
+                .UseConverter(f => $"{f.Front} - {f.Back}")
+                .AddChoices(flashCards)
+        );
+    
+        // Get new data
+        var frontText = _helper.GetUserInputText("front text of the flashcard");
+        var backText = _helper.GetUserInputText("back text of the flashcard");
+    
+        // Update the selected flashcard
+        selectedFlashcard.Front = frontText;
+        selectedFlashcard.Back = backText;
+    
+        // Update in database
+        try
+        {
+            _flashcardRepository.UpdateCard(selectedFlashcard);
+            AnsiConsole.MarkupLine("[green]Stack successfully created![/]");
+        }
+        catch (InvalidOperationException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]{ex.Message}[/]");
+        }
+        catch (Exception ex)
+        {
+            AnsiConsole.MarkupLine("[red]Something went wrong while creating the stack.[/]");
+        }
+    }
     
     public void CreateFlashcard()
     {
@@ -18,7 +60,7 @@ public class FlashcardController
 
         if (allStacks.Count == 0)
         {
-            AnsiConsole.MarkupLine("[red]No stacks are available to edit.[/]");
+            AnsiConsole.MarkupLine("[red]No stacks are available. Create a stack first.[/]");
             Console.ReadKey();
             return;
         }

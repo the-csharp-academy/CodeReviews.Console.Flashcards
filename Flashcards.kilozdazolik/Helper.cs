@@ -29,7 +29,7 @@ public class Helper
         return text;
     }
     
-    public Stack? SelectStack(StackRepository stackRepository, string action)
+    public Stack SelectStack(StackRepository stackRepository, string action)
     {
         List<Stack> allStacks = stackRepository.GetAllStacks();
 
@@ -37,7 +37,6 @@ public class Helper
         {
             AnsiConsole.MarkupLine($"[red]No stacks are available to {action}.[/]");
             Console.ReadKey();
-            return null;
         }
 
         var selectedStack = AnsiConsole.Prompt(
