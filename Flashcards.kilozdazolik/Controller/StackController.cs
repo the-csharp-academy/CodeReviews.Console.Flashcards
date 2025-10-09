@@ -112,7 +112,6 @@ public class StackController
     public void DeleteStack()
     {
         var stackToDelete = _helper.SelectStack(_stackRepository, "delete");
-        if (stackToDelete == null) return;
         
         if (_helper.ConfirmMessage("Delete", stackToDelete.Name))
         {

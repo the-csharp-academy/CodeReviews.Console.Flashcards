@@ -60,7 +60,6 @@ public class StackRepository
         {
             throw new Exception("Database operation failed", e);
         }
-
     }
 
     public List<Stack> GetAllStacks()

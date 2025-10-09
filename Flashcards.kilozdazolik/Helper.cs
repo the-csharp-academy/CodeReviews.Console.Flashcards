@@ -22,7 +22,7 @@ public class Helper
 
         if (text.Equals("Q", StringComparison.OrdinalIgnoreCase))
         {
-            AnsiConsole.MarkupLine("[yellow]Edit cancelled, returning to main menu.[/]");
+            AnsiConsole.MarkupLine($"[yellow]{fieldName} cancelled, returning to main menu.[/]");
             return null;
         }
         

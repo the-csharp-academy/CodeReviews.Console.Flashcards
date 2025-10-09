@@ -8,6 +8,7 @@ public class UserInterface
 {
     private static StackController _stackController = new();
     private static FlashcardController _flashcardController = new();
+    private static SessionController _sessionController = new();
     internal static void MainMenu()
     {
         while (true)
@@ -34,6 +35,12 @@ public class UserInterface
                 case MenuAction.ManageFlashcards:
                     ManageFlashcards();
                     break;
+                case MenuAction.Study:
+                    _sessionController.StartSession();
+                    break;
+                case MenuAction.ViewStudySessions:
+                    ManageSessions();
+                    break;
             }
         }
     }
@@ -56,6 +63,7 @@ public class UserInterface
                 _flashcardController.EditFlashcard();
                 break;
             case ActionType.Delete:
+                _flashcardController.DeleteFlashcard();
                 break;
         }
     }
@@ -82,4 +90,24 @@ public class UserInterface
                 break;
         }
     }
+
+    private static void ManageSessions()
+    {
+        var choice = AnsiConsole.Prompt(
+            new SelectionPrompt<ViewType>()
+                .Title("What do you want to do [green]next[/]?")
+                .PageSize(10)
+                .MoreChoicesText("[grey](Move up and down to choose an option)[/]")
+                .AddChoices(Enum.GetValues<ViewType>()));
+
+        switch (choice)
+        {
+            case ViewType.All:
+                _sessionController.ViewAllSession();
+                break;
+            case ViewType.ByYear:
+                break;
+        }
+    }
+    
 }

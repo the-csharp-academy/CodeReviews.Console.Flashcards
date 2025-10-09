@@ -13,7 +13,28 @@ public class FlashcardController
 
     public void DeleteFlashcard()
     {
+        var stack = _helper.SelectStack(_stackRepository, "select");
+        var flashCards = _flashcardRepository.GetCardsByStack(stack.StackId);
+    
+        // Let user select directly from Flashcard objects
+        var selectedFlashcard = AnsiConsole.Prompt(
+            new SelectionPrompt<Flashcard>()
+                .Title("Select a [cyan]FLASHCARD[/]:")
+                .UseConverter(f => $"{f.Front} - {f.Back}")
+                .AddChoices(flashCards)
+        );
         
+        if (_helper.ConfirmMessage("Delete", selectedFlashcard.Front))
+        {
+            _flashcardRepository.DeleteCard(selectedFlashcard);
+        }
+        else
+        {
+            AnsiConsole.MarkupLine("Deletion canceled.");
+        }
+        
+        AnsiConsole.MarkupLine("[green]Press Any Key to Continue.[/]");
+        Console.ReadKey();
     }
     
     public void EditFlashcard()

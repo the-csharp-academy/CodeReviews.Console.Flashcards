@@ -17,3 +17,9 @@ internal enum ActionType
     Update,
     Delete
 }
+
+internal enum ViewType
+{
+    All,
+    ByYear
+}

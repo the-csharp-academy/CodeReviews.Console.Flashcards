@@ -70,8 +70,19 @@ public class FlashcardRepository
         }
     }
 
-    public void DeleteCard(int cardId)
+    public void DeleteCard(Flashcard flashcard)
     {
-        
+        try
+        {
+            using (var conn = Database.GetConnection())
+            {
+                var sql = "DELETE FROM dbo.flashcards WHERE card_id=@CardId";
+                conn.Execute(sql, flashcard);
+            }
+        }
+        catch (SqlException e)
+        {
+            throw new Exception("Database operation failed", e);
+        }
     }
 }
