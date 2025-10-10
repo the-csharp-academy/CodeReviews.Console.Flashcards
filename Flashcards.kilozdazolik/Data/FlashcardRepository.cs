@@ -16,6 +16,10 @@ public class FlashcardRepository
                 conn.Execute(sql, flashcard);
             }
         }
+        catch (SqlException ex) when (ex.Number == 2627) // duplicate key
+        {
+            throw new InvalidOperationException("A flashcard with this name already exists.", ex);
+        }
         catch (SqlException e)
         {
             throw new Exception("Database operation failed", e);
@@ -51,13 +55,7 @@ public class FlashcardRepository
             using (var conn = Database.GetConnection())
             {
                 var sql = "UPDATE dbo.flashcards SET front = @Front, back = @Back, stack_id = @StackId WHERE card_id = @CardId";
-                conn.Execute(sql, new 
-                {
-                    Front = flashcard.Front,
-                    Back = flashcard.Back,
-                    StackId = flashcard.StackId,
-                    CardId = flashcard.CardId 
-                });
+                conn.Execute(sql, flashcard);
             }
         }
         catch (SqlException ex) when (ex.Number == 2627) // duplicate key

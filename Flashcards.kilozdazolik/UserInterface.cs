@@ -39,7 +39,7 @@ public class UserInterface
                     _sessionController.StartSession();
                     break;
                 case MenuAction.ViewStudySessions:
-                    ManageSessions();
+                    _sessionController.ViewAllSession();
                     break;
             }
         }
@@ -87,25 +87,6 @@ public class UserInterface
                 break;
             case ActionType.Delete:
                 _stackController.DeleteStack();
-                break;
-        }
-    }
-
-    private static void ManageSessions()
-    {
-        var choice = AnsiConsole.Prompt(
-            new SelectionPrompt<ViewType>()
-                .Title("What do you want to do [green]next[/]?")
-                .PageSize(10)
-                .MoreChoicesText("[grey](Move up and down to choose an option)[/]")
-                .AddChoices(Enum.GetValues<ViewType>()));
-
-        switch (choice)
-        {
-            case ViewType.All:
-                _sessionController.ViewAllSession();
-                break;
-            case ViewType.ByYear:
                 break;
         }
     }

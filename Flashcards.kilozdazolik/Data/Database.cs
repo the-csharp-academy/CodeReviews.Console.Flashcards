@@ -28,4 +28,18 @@ internal static class Database
             conn.Execute(createTable);
         }
     }
+    
+    public static void CreateDummyData()
+    {
+        using (var conn = Database.GetConnection())
+        {
+            conn.Execute("INSERT INTO dbo.stacks (name) VALUES ('HTML Basics'); SELECT @StackId_HTML = SCOPE_IDENTITY(); INSERT INTO dbo.stacks (name) VALUES ('SQL Fundamentals'); SELECT @StackId_SQL = SCOPE_IDENTITY();", new { StackId_HTML = 0, StackId_SQL = 0 });
+            
+            int htmlId = conn.QuerySingle<int>("SELECT MAX(stack_id) FROM dbo.stacks WHERE name = 'HTML Basics'");
+            int sqlId = conn.QuerySingle<int>("SELECT MAX(stack_id) FROM dbo.stacks WHERE name = 'SQL Fundamentals'");
+
+            conn.Execute("INSERT INTO dbo.flashcards (stack_id, front, back) VALUES (@HtmlId, 'What is HTML?', 'HyperText Markup Language'), (@HtmlId, 'Root tag?', '<html>'), (@SqlId, 'Data retrieve statement?', 'SELECT'), (@SqlId, 'Unique key?', 'PRIMARY KEY');", new { HtmlId = htmlId, SqlId = sqlId });
+            conn.Execute("INSERT INTO dbo.sessions (stack_id, date, score) VALUES (@HtmlId, DATEADD(day, -1, GETDATE()), 4), (@SqlId, GETDATE(), 3), (@HtmlId, DATEADD(day, -5, GETDATE()), 2);", new { HtmlId = htmlId, SqlId = sqlId });
+        }
+    }
 }

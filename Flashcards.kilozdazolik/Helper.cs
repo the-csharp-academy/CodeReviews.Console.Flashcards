@@ -49,4 +49,15 @@ public class Helper
         AnsiConsole.Clear();
         return selectedStack;
     }
+
+    public Flashcard SelectFlashcard(List<Flashcard> flashcards)
+    {
+        var flashcard = AnsiConsole.Prompt(
+            new SelectionPrompt<Flashcard>()
+                .Title("Select a [cyan]FLASHCARD[/]:")
+                .UseConverter(f => $"{f.Front} - {f.Back}")
+                .AddChoices(flashcards)
+        );
+        return flashcard;
+    }
 }

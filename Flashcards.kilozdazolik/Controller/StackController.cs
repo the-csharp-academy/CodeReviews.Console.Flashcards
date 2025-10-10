@@ -63,7 +63,7 @@ public class StackController
             }
             catch (Exception ex)
             {
-                AnsiConsole.MarkupLine("[red]Something went wrong while creating the stack.[/]");
+                AnsiConsole.MarkupLine($"[red]Something went wrong while creating the stack. ({ex})[/]");
                 success = true; // it will stop looping if unexpected error happens
             }
         } while (!success);
@@ -72,7 +72,6 @@ public class StackController
     public void EditStack()
     {
         var stackToEdit = _helper.SelectStack(_stackRepository, "edit");
-        if (stackToEdit == null) return;
         
         bool success = false;
         do

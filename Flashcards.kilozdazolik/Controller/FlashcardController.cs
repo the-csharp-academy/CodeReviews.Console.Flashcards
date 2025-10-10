@@ -7,23 +7,16 @@ namespace Flashcards.kilozdazolik.Controller;
 
 public class FlashcardController
 {
-    private FlashcardRepository _flashcardRepository = new();
-    private StackRepository _stackRepository = new();
-    private Helper _helper = new();
+    private readonly FlashcardRepository _flashcardRepository = new();
+    private readonly StackRepository _stackRepository = new();
+    private readonly Helper _helper = new();
 
     public void DeleteFlashcard()
     {
         var stack = _helper.SelectStack(_stackRepository, "select");
         var flashCards = _flashcardRepository.GetCardsByStack(stack.StackId);
-    
-        // Let user select directly from Flashcard objects
-        var selectedFlashcard = AnsiConsole.Prompt(
-            new SelectionPrompt<Flashcard>()
-                .Title("Select a [cyan]FLASHCARD[/]:")
-                .UseConverter(f => $"{f.Front} - {f.Back}")
-                .AddChoices(flashCards)
-        );
         
+        var selectedFlashcard = _helper.SelectFlashcard(flashCards);
         if (_helper.ConfirmMessage("Delete", selectedFlashcard.Front))
         {
             _flashcardRepository.DeleteCard(selectedFlashcard);
@@ -41,28 +34,19 @@ public class FlashcardController
     {
         var stack = _helper.SelectStack(_stackRepository, "select");
         var flashCards = _flashcardRepository.GetCardsByStack(stack.StackId);
-    
-        // Let user select directly from Flashcard objects
-        var selectedFlashcard = AnsiConsole.Prompt(
-            new SelectionPrompt<Flashcard>()
-                .Title("Select a [cyan]FLASHCARD[/]:")
-                .UseConverter(f => $"{f.Front} - {f.Back}")
-                .AddChoices(flashCards)
-        );
-    
-        // Get new data
+        
+        var selectedFlashcard = _helper.SelectFlashcard(flashCards);
+        
         var frontText = _helper.GetUserInputText("front text of the flashcard");
         var backText = _helper.GetUserInputText("back text of the flashcard");
-    
-        // Update the selected flashcard
+        
         selectedFlashcard.Front = frontText;
         selectedFlashcard.Back = backText;
-    
-        // Update in database
+        
         try
         {
             _flashcardRepository.UpdateCard(selectedFlashcard);
-            AnsiConsole.MarkupLine("[green]Stack successfully created![/]");
+            AnsiConsole.MarkupLine("[green]Flashcard successfully created![/]");
         }
         catch (InvalidOperationException ex)
         {
@@ -70,48 +54,30 @@ public class FlashcardController
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine("[red]Something went wrong while creating the stack.[/]");
+            AnsiConsole.MarkupLine($"[red]Something went wrong while creating the Flashcard. ({ex.Message})[/]");
         }
     }
     
     public void CreateFlashcard()
     {
-        // The user must select a stack first
-        List<Stack> allStacks = _stackRepository.GetAllStacks();
-
-        if (allStacks.Count == 0)
-        {
-            AnsiConsole.MarkupLine("[red]No stacks are available. Create a stack first.[/]");
-            Console.ReadKey();
-            return;
-        }
-        
-        var getStackId = AnsiConsole.Prompt(
-            new SelectionPrompt<Stack>()
-                .Title("Select a [cyan]STACK[/]:")
-                .UseConverter(s => $"{s.Name}")
-                .AddChoices(allStacks)
-        );
+        var stack = _helper.SelectStack(_stackRepository, "select");
         
         AnsiConsole.Clear();
         
-        // after we got the stackId we are going to ask for the front and back text
         var frontText = _helper.GetUserInputText("front text of the flashcard");
         var backText = _helper.GetUserInputText("back text of the flashcard");
-
-        // create a new flashcard object and assign the variables
+        
         Flashcard flashcard = new()
         {
-            StackId = getStackId.StackId,
+            StackId = stack.StackId,
             Front =  frontText,
             Back = backText,
         };
-
-        // pass it to the db
+        
         try
         {
             _flashcardRepository.InsertCard(flashcard);
-            AnsiConsole.MarkupLine("[green]Stack successfully updated![/]");
+            AnsiConsole.MarkupLine("[green]Flashcard successfully updated![/]");
         }
         catch (InvalidOperationException ex)
         {
@@ -119,19 +85,16 @@ public class FlashcardController
         }
         catch (Exception)
         {
-            AnsiConsole.MarkupLine("[red]Something went wrong while updating the stack.[/]");
+            AnsiConsole.MarkupLine("[red]Something went wrong while updating the Flashcard.[/]");
         }
     }
 
     public void ViewFlashcards()
     {
-        // select a stack to view the flashcards in
         var stack = _helper.SelectStack(_stackRepository, "view flashcards");
-        if (stack == null) return;
         
         var flashCards = _flashcardRepository.GetCardsByStack(stack.StackId);
         
-        // iterate and map through the flashcard list
         List<FlashcardDto> flashCardList = new List<FlashcardDto>();
         int counter = 1;
         foreach (var elem in flashCards)
@@ -145,8 +108,7 @@ public class FlashcardController
             flashCardList.Add(flashCardDto);
             counter++;
         }
-
-        // dispaly dto
+        
         if (flashCardList.Any())
         {
             var table = new Table();

@@ -1,4 +1,5 @@
 ﻿using Flashcards.kilozdazolik.Data;
+using Flashcards.kilozdazolik.Dto;
 using Flashcards.kilozdazolik.Models;
 using Spectre.Console;
 
@@ -63,8 +64,7 @@ public class SessionController
             AnsiConsole.MarkupLine($"[red]Error saving session history: {ex.Message}[/]");
         }
     }
-
-    // TODO: Make the display DTO
+    
     public void ViewAllSession()
     {
         var sessionList = _sessionRepository.GetStudySessions();
@@ -78,6 +78,21 @@ public class SessionController
                 stackNameLookup.Add(stack.StackId, stack.Name);
             }
             
+            List<SessionDto> sessionListDto = new();
+            foreach (var elem in sessionList)
+            {
+                string stackName = stackNameLookup[elem.StackId];
+                
+                var sessionDto = new SessionDto()
+                {
+                    Date =  elem.Date,
+                    Score = elem.Score,
+                    StackName = stackName,
+                };
+                
+                sessionListDto.Add(sessionDto);
+            }
+            
             var table = new Table();
             table.Border(TableBorder.Rounded);
 
@@ -85,14 +100,12 @@ public class SessionController
             table.AddColumn("[yellow]Score[/]");
             table.AddColumn("[yellow]Stack[/]");
 
-            foreach (var session in sessionList)
+            foreach (var sessionDto in sessionListDto)
             {
-                string correctName = stackNameLookup[session.StackId];
-                
                 table.AddRow(
-                    $"[green]{session.Date}[/]",
-                    $"[blue]{session.Score}[/]",
-                    $"[yellow]{correctName}[/]"
+                    $"[green]{sessionDto.Date}[/]",
+                    $"[blue]{sessionDto.Score}[/]",
+                    $"[yellow]{sessionDto.StackName}[/]"
                 );
             }
 

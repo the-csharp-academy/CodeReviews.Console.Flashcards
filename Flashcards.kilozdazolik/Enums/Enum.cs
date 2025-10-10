@@ -21,5 +21,4 @@ internal enum ActionType
 internal enum ViewType
 {
     All,
-    ByYear
 }
