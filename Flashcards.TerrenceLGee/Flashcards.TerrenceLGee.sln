@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flashcards.TerrenceLGee", "Flashcards.TerrenceLGee\Flashcards.TerrenceLGee.csproj", "{83ABC691-8E60-42C2-83BF-46FDD0B55F2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Flashcards.TerrenceLGee.Tests", "Flashcards.TerrenceLGee.Tests\Flashcards.TerrenceLGee.Tests.csproj", "{58DE963D-73A1-48FF-A55B-1F2C6144E75C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{83ABC691-8E60-42C2-83BF-46FDD0B55F2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{83ABC691-8E60-42C2-83BF-46FDD0B55F2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{83ABC691-8E60-42C2-83BF-46FDD0B55F2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{83ABC691-8E60-42C2-83BF-46FDD0B55F2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58DE963D-73A1-48FF-A55B-1F2C6144E75C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58DE963D-73A1-48FF-A55B-1F2C6144E75C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58DE963D-73A1-48FF-A55B-1F2C6144E75C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58DE963D-73A1-48FF-A55B-1F2C6144E75C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
