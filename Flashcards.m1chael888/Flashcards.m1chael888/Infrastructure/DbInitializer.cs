@@ -1,24 +1,24 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace Flashcards.m1chael888.Infrastructure
+namespace Flashcards.m1chael888.Infrastructure;
+
+public interface IDbInitializer
 {
-    public interface IDbInitializer
+    void Initialize();
+}
+public class DbInitializer : IDbInitializer
+{
+    private readonly string _connectionString;
+
+    public DbInitializer(string connectionString)
     {
-        void Initialize();
+        _connectionString = connectionString;
     }
-    public class DbInitializer : IDbInitializer
+
+    public void Initialize()
     {
-        private readonly string _connectionString;
-
-        public DbInitializer(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
-
-        public void Initialize()
-        {
-            var sql = @"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Stacks')
+        var sql = @"IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'Stacks')
                         BEGIN
                             CREATE TABLE Stacks (
                                 StackId INTEGER IDENTITY(1,1) PRIMARY KEY,
@@ -46,10 +46,9 @@ namespace Flashcards.m1chael888.Infrastructure
                             );
                         END";
 
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                connection.Execute(sql);
-            }
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            connection.Execute(sql);
         }
     }
 }

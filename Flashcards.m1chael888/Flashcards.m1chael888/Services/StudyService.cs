@@ -1,30 +1,29 @@
 ﻿using Flashcards.m1chael888.Repositories;
 using Flashcards.m1chael888.Models;
 
-namespace Flashcards.m1chael888.Services
+namespace Flashcards.m1chael888.Services;
+
+public interface IStudyService
 {
-    public interface IStudyService
+    void SessionCreate(SessionModel session);
+    public List<SessionModel> SessionsRead();
+}
+public class StudyService : IStudyService
+{
+    private readonly ISessionRepository _sessionRepository;
+    public StudyService(ISessionRepository sessionRepository) 
     {
-        void SessionCreate(SessionModel session);
-        public List<SessionModel> SessionsRead();
+        _sessionRepository = sessionRepository;
     }
-    public class StudyService : IStudyService
+
+    public void SessionCreate(SessionModel session)
     {
-        private ISessionRepository _sessionRepository;
-        public StudyService(ISessionRepository sessionRepository) 
-        {
-            _sessionRepository = sessionRepository;
-        }
+        _sessionRepository.Create(session);
+    }
 
-        public void SessionCreate(SessionModel session)
-        {
-            _sessionRepository.Create(session);
-        }
-
-        public List<SessionModel> SessionsRead()
-        {
-            var sessions = _sessionRepository.Read();
-            return sessions;
-        }
+    public List<SessionModel> SessionsRead()
+    {
+        var sessions = _sessionRepository.Read();
+        return sessions;
     }
 }

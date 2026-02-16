@@ -1,41 +1,40 @@
 ﻿using Flashcards.m1chael888.Models;
 using Flashcards.m1chael888.Repositories;
 
-namespace Flashcards.m1chael888.Services
+namespace Flashcards.m1chael888.Services;
+
+public interface IStackService
 {
-    public interface IStackService
+    void StackCreate(string stackName);
+    List<StackModel> StacksRead();
+    void StackUpdate(StackModel stack);
+    void StackDelete(StackModel stack);
+}
+public class StackService : IStackService
+{
+    private readonly IStackRepository _stackRepository;
+    public StackService(IStackRepository stackRepository)
     {
-        void StackCreate(string stackName);
-        List<StackModel> StacksRead();
-        void StackUpdate(StackModel stack);
-        void StackDelete(StackModel stack);
+        _stackRepository = stackRepository;
     }
-    public class StackService : IStackService
+
+    public void StackCreate(string stackName)
     {
-        private IStackRepository _stackRepository;
-        public StackService(IStackRepository stackRepository)
-        {
-            _stackRepository = stackRepository;
-        }
+        _stackRepository.Create(stackName);
+    }
 
-        public void StackCreate(string stackName)
-        {
-            _stackRepository.Create(stackName);
-        }
+    public List<StackModel> StacksRead()
+    {
+        return _stackRepository.Read();
+    }
 
-        public List<StackModel> StacksRead()
-        {
-            return _stackRepository.Read();
-        }
+    public void StackUpdate(StackModel stack)
+    {
+        _stackRepository.Update(stack);
+    }
 
-        public void StackUpdate(StackModel stack)
-        {
-            _stackRepository.Update(stack);
-        }
-
-        public void StackDelete(StackModel stack)
-        {
-            _stackRepository.Delete(stack.StackId);
-        }
+    public void StackDelete(StackModel stack)
+    {
+        _stackRepository.Delete(stack.StackId);
     }
 }

@@ -2,46 +2,45 @@
 using Microsoft.Data.SqlClient;
 using Dapper;
 
-namespace Flashcards.m1chael888.Repositories
+namespace Flashcards.m1chael888.Repositories;
+
+public interface ISessionRepository
 {
-    public interface ISessionRepository
+    void Create(SessionModel model);
+    List<SessionModel> Read();
+}
+public class SessionRepository : ISessionRepository
+{
+    private readonly string _connectionString;
+    public SessionRepository(string connectionString)
     {
-        void Create(SessionModel model);
-        List<SessionModel> Read();
+        _connectionString = connectionString;
     }
-    public class SessionRepository : ISessionRepository
+
+    public void Create(SessionModel model)
     {
-        private readonly string _connectionString;
-        public SessionRepository(string connectionString)
-        {
-            _connectionString = connectionString;
-        }
+        var sql = "INSERT INTO Sessions (Date, Score, StackId) VALUES (@Date, @Score, @StackId)";
 
-        public void Create(SessionModel model)
+        using (var connection = new SqlConnection(_connectionString))
         {
-            var sql = "INSERT INTO Sessions (Date, Score, StackId) VALUES (@Date, @Score, @StackId)";
-
-            using (var connection = new SqlConnection(_connectionString))
+            connection.Execute(sql, new
             {
-                connection.Execute(sql, new
-                {
-                    Date = model.Date,
-                    Score = model.Score,
-                    StackId = model.StackId
-                });
-            }
+                Date = model.Date,
+                Score = model.Score,
+                StackId = model.StackId
+            });
         }
+    }
 
-        public List<SessionModel> Read()
+    public List<SessionModel> Read()
+    {
+        var sessions = new List<SessionModel>();
+        var sql = "SELECT * FROM Sessions";
+
+        using (var connection = new SqlConnection(_connectionString))
         {
-            var sessions = new List<SessionModel>();
-            var sql = "SELECT * FROM Sessions";
-
-            using (var connection = new SqlConnection(_connectionString))
-            {
-                sessions = connection.Query<SessionModel>(sql).ToList();
-            }
-            return sessions;
+            sessions = connection.Query<SessionModel>(sql).ToList();
         }
+        return sessions;
     }
 }

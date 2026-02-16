@@ -1,17 +1,16 @@
 ﻿using System.ComponentModel;
 
-namespace Flashcards.m1chael888.Enums
+namespace Flashcards.m1chael888.Enums;
+
+public static class MainMenuViewEnums
 {
-    public static class MainMenuViewEnums
+    public enum MainMenuOption
     {
-        public enum MainMenuOption
-        {
-            [Description("Study")]
-            Study,
-            [Description("Manage stacks")]
-            Manage,
-            [Description("Exit")]
-            Exit
-        }
+        [Description("Study")]
+        Study,
+        [Description("Manage stacks")]
+        Manage,
+        [Description("Exit")]
+        Exit
     }
 }
