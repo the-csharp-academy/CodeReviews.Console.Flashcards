@@ -21,6 +21,8 @@ internal class Program
     {
         try
         {
+            LocalDbController.CreateLocalDbInstance();
+            LocalDbController.StartLocalDb();
             LocalDbController.CreateDatabase();
             LocalDbController.CreateTables();
 

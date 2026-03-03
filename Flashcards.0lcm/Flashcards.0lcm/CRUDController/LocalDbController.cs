@@ -35,6 +35,29 @@ internal class LocalDbController
     }
 
     //------- Initialize Database -------
+    internal static void CreateLocalDbInstance()
+    {
+        try
+        {
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "sqllocaldb",
+                Arguments = $"create {LocalDbName}",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var process = Process.Start(startInfo);
+            process?.WaitForExit();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogCritical(ex, "Could not start Local Db instance.");
+            throw;
+        }
+    }
+    
     internal static void StartLocalDb()
     {
         try
