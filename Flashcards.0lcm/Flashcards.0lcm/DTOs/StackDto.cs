@@ -2,8 +2,8 @@
 
 public class StackDto
 {
-    public int StackId { get; set; } = 0;
-    public int DisplayId { get; set; } = 0;
+    public int StackId { get; set; }
+    public int DisplayId { get; set; }
     public string Name { get; set; } = string.Empty;
-    public int FlashcardCount { get; set; } = 0;
+    public int FlashcardCount { get; set; }
 }

@@ -41,7 +41,7 @@ internal class Program
         catch (Exception ex)
         {
             Logger.LogCritical(ex, "Error caught by Program.cs");
-            System.Environment.Exit(1);
+            Environment.Exit(1);
         }
     }
 }

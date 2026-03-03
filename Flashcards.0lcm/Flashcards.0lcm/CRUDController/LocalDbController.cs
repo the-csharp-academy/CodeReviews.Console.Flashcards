@@ -57,7 +57,7 @@ internal class LocalDbController
             throw;
         }
     }
-    
+
     internal static void StartLocalDb()
     {
         try

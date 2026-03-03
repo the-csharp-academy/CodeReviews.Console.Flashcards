@@ -95,8 +95,6 @@ internal class FlashcardUi(IFlashcardService flashcardService, IStackService sta
                 break;
             case Enums.FlashcardAreaOption.Back:
                 return;
-            default:
-                break;
         }
     }
 

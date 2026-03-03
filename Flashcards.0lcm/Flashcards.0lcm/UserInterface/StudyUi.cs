@@ -89,17 +89,17 @@ internal class StudyUi(IStudyService studyService, IStackService stackService, I
 
         var flashcards = _studyService.RandomizeFlashcards(_flashcardService, stackDto);
         var studyCount = flashcards.Count;
-        
+
         while (true)
         {
             StudyFlashcards(flashcards);
-            
+
             if (flashcards.Count == 0) break;
         }
 
         Console.Clear();
         DisplayHelper.DisplaySpinner("Saving session..", 1500);
-        _studyService.LogStudySession(studyCount, stackId: stackDto.StackId);
+        _studyService.LogStudySession(studyCount, stackDto.StackId);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ internal class StudyUi(IStudyService studyService, IStackService stackService, I
                     flashcards.Remove(flashcards[i]);
                     break;
                 case Enums.StudyMenuOption2.AssignFlashcardForReview:
-                default:    
+                default:
                     break;
             }
         }

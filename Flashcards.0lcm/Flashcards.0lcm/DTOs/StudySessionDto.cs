@@ -2,8 +2,8 @@
 
 public class StudySessionDto
 {
-    public int SessionId { get; set; } = 0;
-    public int DisplayId { get; set; } = 0;
-    public int StudyCount { get; set; } = 0;
-    public int StackId { get; set; } = 0;
+    public int SessionId { get; set; }
+    public int DisplayId { get; set; }
+    public int StudyCount { get; set; }
+    public int StackId { get; set; }
 }
