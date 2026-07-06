@@ -1,4 +1,4 @@
-﻿using silvermax.FlashCards.DtOs;
+﻿using silvermax.FlashCards.Dtos;
 using Spectre.Console;
 
 namespace silvermax.FlashCards;

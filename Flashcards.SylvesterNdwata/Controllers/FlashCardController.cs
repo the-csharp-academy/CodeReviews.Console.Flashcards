@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using silvermax.FlashCards.DtOs;
+using silvermax.FlashCards.Dtos;
 using silvermax.FlashCards.Models;
 using Spectre.Console;
 using static silvermax.FlashCards.Enums;
@@ -53,8 +53,7 @@ internal class FlashCardController
             AnsiConsole.Write(UIHelper.BuildFlashCardTable(cards));
         }
 
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.PressAnyKey();
     }
 
     private void DeleteFlashCard()
@@ -80,7 +79,7 @@ internal class FlashCardController
 
     private void EditFlashCard()
     {
-        var wordToChange = AnsiConsole.Ask<string>("Please enter the word of the FlashCard you want to delete: ");
+        var wordToChange = AnsiConsole.Ask<string>("Please enter the word of the FlashCard you want to edit: ");
         var (word, translation) = input.GetUserInput();
 
         if (!db.FlashCardExists(wordToChange))
@@ -97,14 +96,14 @@ internal class FlashCardController
 
             var cardToUpdate = new 
             {
-                NewWord = wordToChange,
-                Word = word,
+                NewWord = word,
+                Word = wordToChange,
                 Translation = translation,
             };
 
             connection.Execute(updatesql, cardToUpdate);
 
-            AnsiConsole.MarkupLine($"[green]FlashCard with word {word} updated successfully[/]");
+            AnsiConsole.MarkupLine($"[green]FlashCard with word {wordToChange} updated successfully[/]");
         }
 
         UIHelper.PressAnyKey();
@@ -151,7 +150,6 @@ internal class FlashCardController
             }
         }
 
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.PressAnyKey();
     }
 }

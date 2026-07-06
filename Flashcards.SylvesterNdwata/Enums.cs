@@ -9,7 +9,7 @@ internal class Enums
 
     internal enum MenuOptions
     {
-        exit,
+        Exit,
         ManageStacks,
         ManageFlashcards,
         Study,

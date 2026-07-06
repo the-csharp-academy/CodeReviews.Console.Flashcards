@@ -1,4 +1,4 @@
-﻿namespace silvermax.FlashCards.DtOs;
+﻿namespace silvermax.FlashCards.Dtos;
 
 internal class FlashCardResponseDto
 {

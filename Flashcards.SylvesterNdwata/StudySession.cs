@@ -1,10 +1,8 @@
 ﻿using Dapper;
 using silvermax.FlashCards.Controllers;
-using silvermax.FlashCards.DtOs;
+using silvermax.FlashCards.Dtos;
 using silvermax.FlashCards.Models;
 using Spectre.Console;
-using System.Transactions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace silvermax.FlashCards;
 
@@ -18,7 +16,7 @@ internal class StudySession
 
         controller.GetAllStacks();
 
-        var choosenStack = AnsiConsole.Ask<string>("Please write the name of the stack to want to stdy on: ");
+        var choosenStack = AnsiConsole.Ask<string>("Please write the name of the stack to want to study on: ");
         var numberOfQuestions = AnsiConsole.Ask<int>("What is the number of questions you want to do?: ");
 
         using (var connection = db.GetConnection())

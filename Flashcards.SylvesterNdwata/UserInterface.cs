@@ -44,7 +44,7 @@ internal class UserInterface
                     session.ViewStudySessionData();
                     break;
 
-                case MenuOptions.exit:
+                case MenuOptions.Exit:
                     openApp = false;
                     break;
             }

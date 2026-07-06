@@ -1,6 +1,6 @@
 ﻿using Dapper;
 using Microsoft.Data.SqlClient;
-using silvermax.FlashCards.DtOs;
+using silvermax.FlashCards.Dtos;
 using silvermax.FlashCards.Models;
 using Spectre.Console;
 using static silvermax.FlashCards.Enums;
@@ -83,8 +83,7 @@ internal class StacksController
             }
         }
 
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.PressAnyKey();
     }
 
     public string ChooseStack()
@@ -130,8 +129,7 @@ internal class StacksController
             }
         }
 
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.PressAnyKey();
     }
     private void DeleteStack()
     {
@@ -191,8 +189,7 @@ internal class StacksController
             }
         }
 
-        AnsiConsole.MarkupLine("Press Any Key to continue...");
-        Console.ReadKey();
+        UIHelper.PressAnyKey();
     }
 
     private void EditStack()
@@ -205,21 +202,40 @@ internal class StacksController
 
             if (!db.StackExists(stackId))
             {
-                AnsiConsole.MarkupLine($"[red]Stack {stackId} does not exist.[/].");
+                AnsiConsole.MarkupLine($"[red]Stack '{stackName}' does not exist.[/]");
                 UIHelper.PressAnyKey();
                 return;
             }
 
-            string updateSql = "UPDATE Stacks SET StackName = @StackName WHERE stackName = @StackName";
+            var newStackName = AnsiConsole.Ask<string>("Please input the new name for the stack: ").ToLower();
 
-            var stackToUpdate = new Stacks
+            if (string.IsNullOrWhiteSpace(newStackName))
             {
-                StackName = stackName,
-            };
+                AnsiConsole.MarkupLine("[red]New stack name cannot be empty.[/]");
+                UIHelper.PressAnyKey();
+                return;
+            }
 
-            connection.Execute(updateSql, stackToUpdate);
+            if (newStackName == stackName.ToLower())
+            {
+                AnsiConsole.MarkupLine("[yellow]The new name is the same as the current name. No changes made.[/]");
+                UIHelper.PressAnyKey();
+                return;
+            }
 
-            AnsiConsole.MarkupLine($"[green]Stack {stackName} updated successfully[/]");
+            int existingId = db.GetStackId(newStackName);
+            if (db.StackExists(existingId))
+            {
+                AnsiConsole.MarkupLine($"[red]A stack with the name '{newStackName}' already exists.[/]");
+                UIHelper.PressAnyKey();
+                return;
+            }
+
+            string updateSql = "UPDATE Stacks SET StackName = @StackName WHERE Id = @Id";
+
+            connection.Execute(updateSql, new { StackName = newStackName, Id = stackId });
+
+            AnsiConsole.MarkupLine($"[green]Stack '{stackName}' updated to '{newStackName}' successfully[/]");
         }
 
         UIHelper.PressAnyKey();
@@ -236,7 +252,7 @@ internal class StacksController
 
             var stacks = connection.Query<StackResponseDto>("SELECT * FROM Stacks").ToList();
 
-            if (stacks.Count < 0)
+            if (stacks.Count == 0)
             {
                 AnsiConsole.MarkupLine("[red]No rows found in the database[/]");
             }
