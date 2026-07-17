@@ -1,5 +1,4 @@
 using Dapper;
-using Microsoft.Data.SqlClient;
 
 namespace CodeReviews.Console.Flashcards;
 
@@ -10,10 +9,7 @@ public sealed class DatabaseInitializer
     public DatabaseInitializer(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
-
         _schemaScriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts", "Schema.sql");
-        if (string.IsNullOrWhiteSpace(_schemaScriptPath))
-            throw new ArgumentException("The schema script path cannot be empty.", nameof(_schemaScriptPath));
     }
 
     public void Initialize()
@@ -27,26 +23,11 @@ public sealed class DatabaseInitializer
 
     private void EnsureDatabaseExists()
     {
-        using var connection = _connectionFactory.CreateConnection();
-        if (string.IsNullOrWhiteSpace(connection.ConnectionString))
-            throw new InvalidOperationException("Database connection string must not be empty.");
-
-        var builder = new SqlConnectionStringBuilder(connection.ConnectionString);
-
-        var databaseName = builder.InitialCatalog;
-
-        if (string.IsNullOrWhiteSpace(databaseName))
-            throw new InvalidOperationException("The connection string must specify a database name.");
-
-        var masterBuilder = new SqlConnectionStringBuilder(connection.ConnectionString)
+        using (var connection = _connectionFactory.CreateMasterConnection())
         {
-            InitialCatalog = "master"
-        };
+            connection.Open();
 
-        using var masterConnection = new SqlConnection(masterBuilder.ConnectionString);
-        masterConnection.Open();
-
-        const string createDatabaseSql =
+            const string createDatabaseSql =
             @"IF DB_ID(@DatabaseName) IS NULL
                 BEGIN
                     DECLARE @CreateDatabaseSql NVARCHAR(MAX);
@@ -56,18 +37,17 @@ public sealed class DatabaseInitializer
 
                     EXEC sys.sp_executesql @CreateDatabaseSql;
                 END;";
-
-        masterConnection.Execute(createDatabaseSql, new { DatabaseName = databaseName });
+            connection.Execute(createDatabaseSql, new { DatabaseName = _connectionFactory.databaseName });
+        }
     }
 
     private void ExecuteSchemaScript()
     {
         var script = File.ReadAllText(_schemaScriptPath);
-        if (string.IsNullOrWhiteSpace(script))
-            throw new InvalidOperationException($"The database schema script '{_schemaScriptPath}' is empty.");
-
-        using var connection = _connectionFactory.CreateConnection();
-        connection.Open();
-        connection.Execute(script);
+        using (var connection = _connectionFactory.CreateDatabaseConnection())
+        {
+            connection.Open();
+            connection.Execute(script);
+        }
     }
 }
