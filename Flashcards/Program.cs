@@ -12,9 +12,8 @@ class Program
         string connectionString = config.GetConnectionString("DatabaseConnection")
             ?? throw new InvalidOperationException("The DatabaseConnection connection string is missing.");
 
-        var schemaScriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts", "Schema.sql");
         var connectionFactory = new DatabaseConnectionFactory(connectionString);
-        var initializer = new DatabaseInitializer(connectionFactory, schemaScriptPath);
+        var initializer = new DatabaseInitializer(connectionFactory);
 
         try
         {

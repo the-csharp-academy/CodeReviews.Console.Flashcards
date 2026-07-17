@@ -7,18 +7,13 @@ public sealed class DatabaseInitializer
 {
     private readonly IDatabaseConnectionFactory _connectionFactory;
     private readonly string _schemaScriptPath;
-    public DatabaseInitializer(IDatabaseConnectionFactory connectionFactory, string schemaScriptPath)
+    public DatabaseInitializer(IDatabaseConnectionFactory connectionFactory)
     {
         _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
 
-        if (string.IsNullOrWhiteSpace(schemaScriptPath))
-        {
-            throw new ArgumentException(
-                "The schema script path cannot be empty.",
-                nameof(schemaScriptPath));
-        }
-
-        _schemaScriptPath = schemaScriptPath;
+        _schemaScriptPath = Path.Combine(AppContext.BaseDirectory, "Scripts", "Schema.sql");
+        if (string.IsNullOrWhiteSpace(_schemaScriptPath))
+            throw new ArgumentException("The schema script path cannot be empty.", nameof(_schemaScriptPath));
     }
 
     public void Initialize()
