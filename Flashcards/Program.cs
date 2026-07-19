@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Spectre.Console;
 
 namespace CodeReviews.Console.Flashcards;
+
 class Program
 {
     static void Main(string[] args)
@@ -13,17 +15,21 @@ class Program
 
         var connectionFactory = new DatabaseConnectionFactory(connectionString);
         var initializer = new DatabaseInitializer(connectionFactory);
-
+        var appView = new AppView();
+        var appController = new AppController(appView);
         try
         {
             initializer.Initialize();
-            AnsiConsole.MarkupLine("[green]Database initialization complete. Ready to run.[/]");
+            appView.DisplayMessage("[green]Database initialization complete. Ready to run.[/]");
         }
         catch (Exception ex)
         {
-            AnsiConsole.MarkupLine($"[red]Database initialization failed: {ex.Message}[/]");
+            appView.DisplayMessage($"[red]Database initialization failed: {ex.Message}[/]");
             throw;
         }
+
+        appController.Run();
+
     }
 
     private static IConfigurationRoot Setup()
