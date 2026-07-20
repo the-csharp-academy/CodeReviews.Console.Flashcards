@@ -4,4 +4,5 @@ public interface IStacksRepo
     void Add(string name);
     void Update(long stackId, string newName);
     void Delete(long stackId);
+    CardStack? GetStackByName(string name);
 }

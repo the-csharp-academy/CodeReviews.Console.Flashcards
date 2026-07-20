@@ -25,7 +25,15 @@ public sealed class StacksRepo : IStacksRepo
 
     public void Delete(long stackId)
     {
-        throw new NotImplementedException();
+        const string sql = @"
+            DELETE FROM dbo.Stacks
+            WHERE StackId = @StackId;
+        ";
+        using (var connection = _connectionFactory.CreateDatabaseConnection())
+        {
+            connection.Open();
+            connection.Execute(sql, new { StackId = stackId });
+        }
     }
 
     public List<CardStack> GetAll()
@@ -49,8 +57,34 @@ public sealed class StacksRepo : IStacksRepo
         return stacks;
     }
 
+    public CardStack? GetStackByName(string name)
+    {
+        const string sql = @"
+            SELECT * FROM dbo.Stacks
+            WHERE Name = @Name
+        ";
+        using (var connection = _connectionFactory.CreateDatabaseConnection())
+        {
+            connection.Open();
+            return connection.QuerySingleOrDefault<CardStack>(sql, new { Name = name });
+        }
+    }
+
     public void Update(long stackId, string newName)
     {
-        throw new NotImplementedException();
+        // this method is questionable
+        if (string.IsNullOrWhiteSpace(newName))
+            throw new ArgumentNullException();
+
+        const string sql = @"
+            UPDATE dbo.Stacks
+            SET Name = @Name
+            WHERE StackId = @StackId;
+        ";
+        using (var connection = _connectionFactory.CreateDatabaseConnection())
+        {
+            connection.Open();
+            connection.Execute(sql, new { StackId = stackId, Name = newName });
+        }
     }
 }

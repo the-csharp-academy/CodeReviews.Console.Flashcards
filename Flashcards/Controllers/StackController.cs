@@ -53,12 +53,51 @@ public sealed class StackController : IStackController
 
     public void DeleteStack()
     {
-        throw new NotImplementedException();
+        CardStack? stackToDelete;
+        string enteredName = _stacksView.AskForStackName();
+        try
+        {
+            stackToDelete = _stacksRepo.GetStackByName(enteredName);
+            if (stackToDelete == null)
+            {
+                _stacksView.DisplayError($"Stack named {enteredName} could not be found");
+                return;
+            }
+            _stacksRepo.Delete(stackToDelete.StackId);
+        }
+        catch (ArgumentNullException e)
+        {
+            _stacksView.DisplayError("Stack name cannot be null " + e.Message);
+        }
+        catch (Exception e)
+        {
+            _stacksView.DisplayError("Some error occured " + e.Message);
+        }
     }
 
     public void EditStack()
     {
-        throw new NotImplementedException();
+        CardStack? stackToEdit;
+        string enteredName = _stacksView.AskForStackName();
+        try
+        {
+            stackToEdit = _stacksRepo.GetStackByName(enteredName);
+            if (stackToEdit == null)
+            {
+                _stacksView.DisplayError($"Stack named {enteredName} could not be found");
+                return;
+            }
+            enteredName = _stacksView.AskForStackName();
+            _stacksRepo.Update(stackToEdit.StackId, enteredName);
+        }
+        catch (ArgumentNullException e)
+        {
+            _stacksView.DisplayError("Stack name cannot be null " + e.Message);
+        }
+        catch (Exception e)
+        {
+            _stacksView.DisplayError("Some error occured " + e.Message);
+        }
     }
 
     public void ViewStacks()
