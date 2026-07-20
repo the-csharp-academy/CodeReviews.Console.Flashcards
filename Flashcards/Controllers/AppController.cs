@@ -4,10 +4,11 @@ namespace CodeReviews.Console.Flashcards;
 public sealed class AppController
 {
     private readonly IAppView _appView;
-
-    public AppController(IAppView _view)
+    private readonly IStackController _stackController;
+    public AppController(IAppView _view, IStackController _controller)
     {
         _appView = _view;
+        _stackController = _controller;  
     }
 
     public void Run()
@@ -21,6 +22,7 @@ public sealed class AppController
             switch (selectedOption)
             {
                 case MainMenuOption.ManageStacks:
+                    _stackController.Run();
                     break;
 
                 case MainMenuOption.ManageFlashcards:

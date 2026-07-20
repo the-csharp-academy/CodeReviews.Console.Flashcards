@@ -11,7 +11,7 @@ public sealed class AppView : IAppView
         .UseConverter(FormatMenuOption)
     );
     public void DisplayGoodbye() => AnsiConsole.MarkupLine("[yellow]Goodbye![/]");
-    public void DisplayMessage(string message) => AnsiConsole.MarkupLine(Markup.Escape(message));
+    public void DisplayMessage(string message) => AnsiConsole.MarkupLine($"[green]{Markup.Escape(message)}[/]");
     private static string FormatMenuOption(MainMenuOption option)
     {
         return option switch

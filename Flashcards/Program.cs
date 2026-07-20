@@ -15,8 +15,11 @@ class Program
 
         var connectionFactory = new DatabaseConnectionFactory(connectionString);
         var initializer = new DatabaseInitializer(connectionFactory);
+        var stacksRepository = new StacksRepo(connectionFactory);
         var appView = new AppView();
-        var appController = new AppController(appView);
+        var stacksView = new StacksView();
+        var stackController = new StackController(stacksView, stacksRepository);
+        var appController = new AppController(appView, stackController);
         try
         {
             initializer.Initialize();
