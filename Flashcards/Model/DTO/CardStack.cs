@@ -1,11 +1,11 @@
 public class CardStack
 {
     public long StackId;
-    public string? Name;
+    public string Name { get; set; } = string.Empty;
 }
 
 public class CardStackDTO
 {
-    public string? Name;
-    public int? CardCount;
+    public string Name { get; set; } = string.Empty;
+    public int CardCount { get; set; } = 0;
 }
