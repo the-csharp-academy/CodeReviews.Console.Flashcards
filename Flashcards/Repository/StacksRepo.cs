@@ -11,7 +11,7 @@ public sealed class StacksRepo : IStacksRepo
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentNullException();
-        // throw something tho
+
         const string sql = @"
             INSERT INTO dbo.Stacks (Name)
             VALUES (@Name);

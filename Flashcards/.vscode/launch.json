@@ -13,11 +13,12 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/CodeReviews.Console.CodingTracker/CodingTracker/bin/Debug/net9.0/Flashcards.dll",
+            "program": "${workspaceFolder}/bin/Debug/net9.0/Flashcards.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/CodeReviews.Console.Flashcards",
+            "cwd": "${workspaceFolder}",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
-            "console": "externalTerminal",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
             "stopAtEntry": false
         },
         {

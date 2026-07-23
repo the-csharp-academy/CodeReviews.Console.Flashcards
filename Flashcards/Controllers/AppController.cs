@@ -5,10 +5,12 @@ public sealed class AppController
 {
     private readonly IAppView _appView;
     private readonly IStackController _stackController;
-    public AppController(IAppView _view, IStackController _controller)
+    private readonly IFlashcardController _cardController;
+    public AppController(IAppView view, IStackController stackController, IFlashcardController cardController)
     {
-        _appView = _view;
-        _stackController = _controller;  
+        _appView = view;
+        _stackController = stackController;
+        _cardController = cardController;
     }
 
     public void Run()
@@ -26,6 +28,7 @@ public sealed class AppController
                     break;
 
                 case MainMenuOption.ManageFlashcards:
+                    _cardController.Run();
                     break;
 
                 case MainMenuOption.Exit:

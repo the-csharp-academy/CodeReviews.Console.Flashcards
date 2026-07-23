@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using Spectre.Console;
 
 namespace CodeReviews.Console.Flashcards;
 
@@ -16,10 +14,13 @@ class Program
         var connectionFactory = new DatabaseConnectionFactory(connectionString);
         var initializer = new DatabaseInitializer(connectionFactory);
         var stacksRepository = new StacksRepo(connectionFactory);
+        var flashcardsRepository = new FlashcardsRepo(connectionFactory);
         var appView = new AppView();
         var stacksView = new StacksView();
+        var flashcardsView = new FlashcardsView();
         var stackController = new StackController(stacksView, stacksRepository);
-        var appController = new AppController(appView, stackController);
+        var flashcardController = new FlashcardController(flashcardsView, flashcardsRepository, stacksRepository);
+        var appController = new AppController(appView, stackController, flashcardController);
         try
         {
             initializer.Initialize();
