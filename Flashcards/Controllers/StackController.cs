@@ -115,11 +115,7 @@ public sealed class StackController : IStackController
         List<CardStackDTO> dto = new();
         foreach (var item in stacks)
         {
-            dto.Add(new CardStackDTO
-            {
-                Name = item.Name,
-                CardCount = 0,
-            });
+            dto.Add(new CardStackDTO { Name = item.Name, });
         }
 
         return dto.AsReadOnly<CardStackDTO>();

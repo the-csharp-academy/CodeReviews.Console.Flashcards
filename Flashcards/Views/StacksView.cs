@@ -31,12 +31,10 @@ public sealed class StacksView : IStacksView
             return;
         }
 
-        var table = new Table()
-            .AddColumn("Name")
-            .AddColumn("Amount of cards");
+        var table = new Table().AddColumn("Name");
 
         foreach (var row in stacks)
-            table.AddRow(Markup.Escape(row.Name), row.CardCount.ToString());
+            table.AddRow(Markup.Escape(row.Name));
 
         AnsiConsole.Write(table);
     }

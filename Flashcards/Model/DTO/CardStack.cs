@@ -7,5 +7,4 @@ public class CardStack
 public class CardStackDTO
 {
     public string Name { get; set; } = string.Empty;
-    public int CardCount { get; set; } = 0;
 }
