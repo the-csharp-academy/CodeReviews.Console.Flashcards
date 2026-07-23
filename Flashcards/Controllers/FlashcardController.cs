@@ -1,5 +1,3 @@
-using Spectre.Console;
-
 public sealed class FlashcardController : IFlashcardController
 {
     private readonly IFlashcardsView _flashcardsView;
@@ -81,15 +79,7 @@ public sealed class FlashcardController : IFlashcardController
         });
     }
 
-    public string ChangeStack()
-        => AnsiConsole.Prompt(
-            new TextPrompt<string>("Enter the stack name:")
-            .Validate(name =>
-                string.IsNullOrWhiteSpace(name) ?
-                ValidationResult.Error("[red]Stack name cannot be empty.[/]") :
-                ValidationResult.Success())
-        ).Trim();
-
+    public string ChangeStack() => _flashcardsView.SelectStack();
     public void DeleteCard()
     {
         if (string.IsNullOrWhiteSpace(_currentStackName))
