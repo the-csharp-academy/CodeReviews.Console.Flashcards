@@ -6,11 +6,17 @@ public sealed class AppController
     private readonly IAppView _appView;
     private readonly IStackController _stackController;
     private readonly IFlashcardController _cardController;
-    public AppController(IAppView view, IStackController stackController, IFlashcardController cardController)
+    private readonly IStudySessionController _sessionController;
+    public AppController(
+        IAppView view,
+        IStackController stackController,
+        IFlashcardController cardController,
+        IStudySessionController sessionController)
     {
         _appView = view;
         _stackController = stackController;
         _cardController = cardController;
+        _sessionController = sessionController;
     }
 
     public void Run()
@@ -29,6 +35,14 @@ public sealed class AppController
 
                 case MainMenuOption.ManageFlashcards:
                     _cardController.Run();
+                    break;
+
+                case MainMenuOption.Study:
+                    _sessionController.Study();
+                    break;
+
+                case MainMenuOption.ViewStudyHistory:
+                    _sessionController.ViewHistory();
                     break;
 
                 case MainMenuOption.Exit:

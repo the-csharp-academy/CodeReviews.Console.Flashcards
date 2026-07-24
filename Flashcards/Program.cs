@@ -13,14 +13,34 @@ class Program
 
         var connectionFactory = new DatabaseConnectionFactory(connectionString);
         var initializer = new DatabaseInitializer(connectionFactory);
+
         var stacksRepository = new StacksRepo(connectionFactory);
         var flashcardsRepository = new FlashcardsRepo(connectionFactory);
+        var sessionsRepository = new StudySessionsRepo(connectionFactory);
+
         var appView = new AppView();
         var stacksView = new StacksView();
         var flashcardsView = new FlashcardsView();
+        var sessionsView = new StudySessionsView();
+
+        var answerChecker = new AnswerChecker();
+
         var stackController = new StackController(stacksView, stacksRepository);
         var flashcardController = new FlashcardController(flashcardsView, flashcardsRepository, stacksRepository);
-        var appController = new AppController(appView, stackController, flashcardController);
+        var sessionController =
+            new StudySessionController(
+                sessionsView,
+                stacksRepository,
+                flashcardsRepository,
+                sessionsRepository,
+                answerChecker);
+        var appController
+            = new AppController(
+                appView,
+                stackController,
+                flashcardController,
+                sessionController);
+
         try
         {
             initializer.Initialize();

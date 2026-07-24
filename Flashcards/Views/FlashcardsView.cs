@@ -36,7 +36,7 @@ public sealed class FlashcardsView : IFlashcardsView
         AnsiConsole.Write(table);
     }
 
-    public void DisplayMessage(string message) => AnsiConsole.MarkupLine($"[green]{Markup.Escape(message)}[/]");
+    public void DisplayMessage(string message) => AnsiConsole.MarkupLine(Markup.Escape(message));
 
     public FlashcardsOption ShowFlashcardsOption()
         => AnsiConsole.Prompt(

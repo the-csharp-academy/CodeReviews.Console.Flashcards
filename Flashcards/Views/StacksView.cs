@@ -19,7 +19,7 @@ public sealed class StacksView : IStacksView
         WaitForInput();
     }
 
-    public void DisplayMessage(string message) => AnsiConsole.MarkupLine($"[green]{Markup.Escape(message)}[/]");
+    public void DisplayMessage(string message) => AnsiConsole.MarkupLine(Markup.Escape(message));
     public void DisplayStacks(IReadOnlyList<CardStackDTO> stacks)
     {
         AnsiConsole.Clear();
