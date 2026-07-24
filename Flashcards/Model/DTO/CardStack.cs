@@ -1,6 +1,6 @@
 public class CardStack
 {
-    public long StackId;
+    public int StackId;
     public string Name { get; set; } = string.Empty;
 }
 

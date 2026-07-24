@@ -34,7 +34,7 @@ public sealed class FlashcardsRepo : IFlashcardsRepo
         }
     }
 
-    public void Delete(long cardId)
+    public void Delete(int cardId)
     {
         const string sql = @"
             DELETE FROM dbo.Flashcards
@@ -47,13 +47,14 @@ public sealed class FlashcardsRepo : IFlashcardsRepo
         }
     }
 
-    public IReadOnlyList<Flashcard> GetAllByStackId(long stackId)
+    public IReadOnlyList<Flashcard> GetAllByStackId(int stackId)
     {
         List<Flashcard> cards = new();
 
         const string sql = @"
             SELECT * FROM dbo.Flashcards
-            WHERE StackId = @StackId;
+            WHERE StackId = @StackId
+            ORDER BY FlashcardId;
         ";
         using (var connection = _connectionFactory.CreateDatabaseConnection())
         {

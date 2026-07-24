@@ -74,7 +74,7 @@ public sealed class StackControllerTests
 
         _view.Received(1).DisplayError("Stack named Missing could not be found");
 
-        _repository.DidNotReceive().Delete(Arg.Any<long>());
+        _repository.DidNotReceive().Delete(Arg.Any<int>());
     }
 
     [Test]
@@ -105,7 +105,7 @@ public sealed class StackControllerTests
 
         _view.Received(1).DisplayError("Stack named Missing could not be found");
 
-        _repository.DidNotReceive().Update(Arg.Any<long>(), Arg.Any<string>());
+        _repository.DidNotReceive().Update(Arg.Any<int>(), Arg.Any<string>());
 
         _view.Received(1).AskForStackName();
     }
@@ -134,8 +134,8 @@ public sealed class StackControllerTests
         _view.Received(1).ShowStacksOption();
         _repository.DidNotReceive().GetAll();
         _repository.DidNotReceive().Add(Arg.Any<string>());
-        _repository.DidNotReceive().Delete(Arg.Any<long>());
-        _repository.DidNotReceive().Update(Arg.Any<long>(), Arg.Any<string>());
+        _repository.DidNotReceive().Delete(Arg.Any<int>());
+        _repository.DidNotReceive().Update(Arg.Any<int>(), Arg.Any<string>());
     }
 
     [Test]
@@ -152,9 +152,9 @@ public sealed class StackControllerTests
         _repository.DidNotReceive().GetAll();
         _repository.DidNotReceive().Add(Arg.Any<string>());
         _repository.DidNotReceive().GetStackByName(Arg.Any<string>());
-        _repository.DidNotReceive().Delete(Arg.Any<long>());
+        _repository.DidNotReceive().Delete(Arg.Any<int>());
         _repository.DidNotReceive().Update(
-            Arg.Any<long>(),
+            Arg.Any<int>(),
             Arg.Any<string>());
     }
 

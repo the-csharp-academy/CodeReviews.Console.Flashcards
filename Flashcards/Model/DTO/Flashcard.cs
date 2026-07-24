@@ -1,14 +1,14 @@
 public class Flashcard
 {
-    public long FlashcardId;
-    public long StackId;
+    public int FlashcardId;
+    public int StackId;
     public string Question { get; set; } = string.Empty;
     public string Answer { get; set; } = string.Empty;
 }
 
 public class FlashcardDTO
 {
-    public long DisplayId { get; set; }
+    public int DisplayId { get; set; }
     public string Question { get; set; } = string.Empty;
     public string Answer { get; set; } = string.Empty;
 }

@@ -1,8 +1,8 @@
 public interface IFlashcardsRepo
 {
-    IReadOnlyList<Flashcard> GetAllByStackId(long stackId);
+    IReadOnlyList<Flashcard> GetAllByStackId(int stackId);
     void Add(Flashcard card);
     void Update(Flashcard card);
-    void Delete(long cardId);
+    void Delete(int cardId);
 
 }

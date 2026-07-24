@@ -127,7 +127,7 @@ public sealed class FlashcardController : IFlashcardController
             return;
         }
 
-        long cardId = cards[selectedIndex - 1].FlashcardId;
+        int cardId = cards[selectedIndex - 1].FlashcardId;
 
         try
         {

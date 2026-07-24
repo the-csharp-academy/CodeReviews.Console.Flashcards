@@ -117,7 +117,7 @@ public sealed class FlashcardControllerTests
 
         _view.Received(1).DisplayError("An error occurred while retrieving the stack: Database unavailable.");
 
-        _flashcardsRepo.DidNotReceive().GetAllByStackId(Arg.Any<long>());
+        _flashcardsRepo.DidNotReceive().GetAllByStackId(Arg.Any<int>());
     }
 
     [Test]
@@ -133,7 +133,7 @@ public sealed class FlashcardControllerTests
 
         _view.Received(1).WaitForInput();
 
-        _flashcardsRepo.DidNotReceive().Delete(Arg.Any<long>());
+        _flashcardsRepo.DidNotReceive().Delete(Arg.Any<int>());
     }
 
     [Test]
@@ -287,13 +287,13 @@ public sealed class FlashcardControllerTests
 
         _view.Received(1).ShowFlashcardsOption();
 
-        _flashcardsRepo.DidNotReceive().GetAllByStackId(Arg.Any<long>());
+        _flashcardsRepo.DidNotReceive().GetAllByStackId(Arg.Any<int>());
 
         _flashcardsRepo.DidNotReceive().Add(Arg.Any<Flashcard>());
 
         _flashcardsRepo.DidNotReceive().Update(Arg.Any<Flashcard>());
 
-        _flashcardsRepo.DidNotReceive().Delete(Arg.Any<long>());
+        _flashcardsRepo.DidNotReceive().Delete(Arg.Any<int>());
     }
 
     [Test]
@@ -333,7 +333,7 @@ public sealed class FlashcardControllerTests
         _view.Received(1).DisplayFlashcards(Arg.Any<IReadOnlyList<FlashcardDTO>>());
     }
 
-    private void ConfigureSelectedStack(string name, long stackId)
+    private void ConfigureSelectedStack(string name, int stackId)
     {
         SetCurrentStackName(name);
 

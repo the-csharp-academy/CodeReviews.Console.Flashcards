@@ -23,7 +23,7 @@ public sealed class StacksRepo : IStacksRepo
         }
     }
 
-    public void Delete(long stackId)
+    public void Delete(int stackId)
     {
         const string sql = @"
             DELETE FROM dbo.Stacks
@@ -70,7 +70,7 @@ public sealed class StacksRepo : IStacksRepo
         }
     }
 
-    public void Update(long stackId, string newName)
+    public void Update(int stackId, string newName)
     {
         // this method is questionable
         if (string.IsNullOrWhiteSpace(newName))

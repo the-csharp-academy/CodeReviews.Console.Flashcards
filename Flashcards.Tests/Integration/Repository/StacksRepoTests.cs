@@ -60,7 +60,7 @@ public sealed class StacksRepoTests
     [Test]
     public void GetStackByName_WhenStackExists_ReturnsMatchingStack()
     {
-        long stackId = InsertStack("German");
+        int stackId = InsertStack("German");
 
         CardStack? result = _repository.GetStackByName("German");
 
@@ -83,7 +83,7 @@ public sealed class StacksRepoTests
     [Test]
     public void Update_WhenStackExists_ChangesItsName()
     {
-        long stackId = InsertStack("Old name");
+        int stackId = InsertStack("Old name");
 
         _repository.Update(stackId, "New name");
 
@@ -104,7 +104,7 @@ public sealed class StacksRepoTests
     [Test]
     public void Delete_WhenStackExists_RemovesIt()
     {
-        long stackId = InsertStack("German");
+        int stackId = InsertStack("German");
 
         _repository.Delete(stackId);
 
@@ -130,7 +130,7 @@ public sealed class StacksRepoTests
         Assert.Throws<SqlException>(() => _repository.Add("German"));
     }
 
-    private long InsertStack(string name)
+    private int InsertStack(string name)
     {
         using (var connection = _database.OpenConnection())
         {
@@ -140,7 +140,7 @@ public sealed class StacksRepoTests
                 SELECT CAST(SCOPE_IDENTITY() AS BIGINT);
             ";
 
-            return connection.QuerySingle<long>(sql, new { Name = name });
+            return connection.QuerySingle<int>(sql, new { Name = name });
         }
 
     }

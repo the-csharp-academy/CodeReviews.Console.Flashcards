@@ -11,7 +11,7 @@ public sealed class FlashcardsRepoTests
 {
     private TestDatabase _database;
     private IFlashcardsRepo _repository;
-    private long _stackId;
+    private int _stackId;
 
     [SetUp]
     public void SetUp()
@@ -27,11 +27,11 @@ public sealed class FlashcardsRepoTests
     [TearDown]
     public void TearDown() => _database.Dispose();
 
-    private long InsertStack(string name)
+    private int InsertStack(string name)
     {
         using var connection = _database.OpenConnection();
 
-        return connection.QuerySingle<long>(
+        return connection.QuerySingle<int>(
             """
             INSERT INTO dbo.Stacks (Name)
             VALUES (@Name);
@@ -80,7 +80,7 @@ public sealed class FlashcardsRepoTests
     [Test]
     public void GetAllByStackId_ReturnsOnlyCardsFromRequestedStack()
     {
-        long secondStackId = InsertStack("Polish");
+        int secondStackId = InsertStack("Polish");
 
         InsertFlashcard(new FlashcardRecord
         {
@@ -127,7 +127,7 @@ public sealed class FlashcardsRepoTests
     [Test]
     public void Update_WhenCardExists_ChangesQuestionAndAnswer()
     {
-        long cardId = InsertFlashcard(new FlashcardRecord
+        int cardId = InsertFlashcard(new FlashcardRecord
         {
             StackId = _stackId,
             Question = "Old question",
@@ -164,7 +164,7 @@ public sealed class FlashcardsRepoTests
     [Test]
     public void Delete_WhenCardExists_RemovesFlashcard()
     {
-        long cardId = InsertFlashcard(new FlashcardRecord
+        int cardId = InsertFlashcard(new FlashcardRecord
         {
             StackId = _stackId,
             Question = "Haus",
@@ -191,7 +191,7 @@ public sealed class FlashcardsRepoTests
     {
         var card = new Flashcard
         {
-            StackId = long.MaxValue,
+            StackId = int.MaxValue,
             Question = "Question",
             Answer = "Answer"
         };
@@ -215,11 +215,11 @@ public sealed class FlashcardsRepoTests
         Assert.Throws<ArgumentException>(() => _repository.Add(card));
     }
 
-    private long InsertFlashcard(FlashcardRecord record)
+    private int InsertFlashcard(FlashcardRecord record)
     {
         using var connection = _database.OpenConnection();
 
-        return connection.QuerySingle<long>(
+        return connection.QuerySingle<int>(
             """
             INSERT INTO dbo.Flashcards
                 (StackId, Question, Answer)
@@ -238,8 +238,8 @@ public sealed class FlashcardsRepoTests
 
     private sealed class FlashcardRecord
     {
-        public long FlashcardId { get; set; }
-        public long StackId { get; set; }
+        public int FlashcardId { get; set; }
+        public int StackId { get; set; }
         public string Question { get; set; } = string.Empty;
         public string Answer { get; set; } = string.Empty;
     }
