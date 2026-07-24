@@ -42,13 +42,6 @@ public sealed class StudySessionsView : IStudySessionsView
         AnsiConsole.MarkupLine($"[bold cyan]Front:[/] {Markup.Escape(question)}");
     }
 
-    public void WaitToRevealAnswer()
-    {
-        AnsiConsole.WriteLine();
-        AnsiConsole.MarkupLine("[grey]Press any key to reveal the answer.[/]");
-        AnsiConsole.Console.Input.ReadKey(intercept: true);
-    }
-
     private static void WaitForInput()
     {
         AnsiConsole.MarkupLine("\n[grey]Press any key to continue.[/]");
@@ -98,11 +91,16 @@ public sealed class StudySessionsView : IStudySessionsView
                 row.Score.ToString(),
                 row.TotalQuestions.ToString(),
                 FormatPercentage(row.Percentage),
-                row.CompletedAt.ToString("yyyy-MM-dd HH:mm")
+                FormatCompletedAt(row.CompletedAt)
             );
 
         AnsiConsole.Write(table);
+        WaitForInput();
     }
 
-    private static string FormatPercentage(double p) => $"{p}%";
+    private static string FormatPercentage(double p) => $"{p:F1}%";
+
+    private static string FormatCompletedAt(DateTime completedAt)
+        => DateTime.SpecifyKind(completedAt, DateTimeKind.Utc)
+                    .ToLocalTime().ToString();
 }

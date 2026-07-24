@@ -6,7 +6,7 @@ public sealed class AppView : IAppView
 {
     public MainMenuOption DisplayMainMenu() => AnsiConsole.Prompt(
         new SelectionPrompt<MainMenuOption>()
-        .Title("[purple]Coding Tracker[/]")
+        .Title("[purple]Flashcards[/]")
         .AddChoices(Enum.GetValues<MainMenuOption>())
         .UseConverter(FormatMenuOption)
     );
@@ -18,8 +18,10 @@ public sealed class AppView : IAppView
         {
             MainMenuOption.ManageStacks => "Manage stacks",
             MainMenuOption.ManageFlashcards => "Manage flashcards",
+            MainMenuOption.Study => "Study",
+            MainMenuOption.ViewStudyHistory => "View study history",
             MainMenuOption.Exit => "Exit",
-            _ => option.ToString()
+            _ => throw new ArgumentOutOfRangeException(nameof(option), option, null)
         };
     }
 }

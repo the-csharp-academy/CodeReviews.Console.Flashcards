@@ -1,5 +1,3 @@
-using NSubstitute;
-
 namespace CodeReviews.Console.Flashcards.Tests;
 
 [TestFixture]
@@ -18,7 +16,7 @@ public sealed class AnswerCheckerTests
 
     [SetUp]
     public void SetUp()
-        => _answerChecker = Substitute.For<IAnswerChecker>();
+        => _answerChecker = new AnswerChecker();
 
     [TestCaseSource(nameof(testCases))]
     public void IsCorrect_ReturnsExpectedResult(string userAnswer, string correctAnswer, bool expected)

@@ -11,13 +11,7 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
 
     public void Add(StudySession session)
     {
-        if (session == null)
-            throw new ArgumentNullException();
-        if (session.StackId <= 0 ||
-            session.TotalQuestions <= 0 ||
-            session.Score < 0 ||
-            session.Score > session.TotalQuestions)
-            throw new ArgumentException(nameof(session));
+        ValidateSession(session);
 
         const string sql = @"
             INSERT INTO dbo.StudySessions(StackId, Score, TotalQuestions)
@@ -28,7 +22,6 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
         {
             connection.Open();
             connection.Execute(sql, session);
-            // keep a watch as it might throw exception
         }
     }
 
@@ -49,6 +42,31 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
         {
             connection.Open();
             return connection.Query<StudySessionDTO>(sql).ToList().AsReadOnly();
+        }
+    }
+
+    private static void ValidateSession(StudySession session)
+    {
+        if (session == null)
+            throw new ArgumentNullException();
+
+        if (session.StackId <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(session.StackId));
+        }
+
+        if (session.TotalQuestions <= 0)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(session.TotalQuestions));
+        }
+
+        if (session.Score < 0 ||
+            session.Score > session.TotalQuestions)
+        {
+            throw new ArgumentOutOfRangeException(
+                nameof(session.Score));
         }
     }
 }

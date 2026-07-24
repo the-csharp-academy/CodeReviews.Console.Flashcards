@@ -44,12 +44,13 @@ class Program
         try
         {
             initializer.Initialize();
-            appView.DisplayMessage("[green]Database initialization complete. Ready to run.[/]");
+            appView.DisplayMessage("Database initialization complete. Ready to run.");
         }
         catch (Exception ex)
         {
-            appView.DisplayMessage($"[red]Database initialization failed: {ex.Message}[/]");
-            throw;
+            appView.DisplayMessage($"Database initialization failed: {ex.Message}");
+            Environment.ExitCode = 1;
+            return;
         }
 
         appController.Run();
