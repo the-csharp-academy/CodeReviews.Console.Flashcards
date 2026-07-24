@@ -64,6 +64,31 @@ public sealed class FlashcardControllerTests
     }
 
     [Test]
+    public void AddCard_WhenRepositoryThrows_DisplaysError()
+    {
+        SetCurrentStackName("German");
+
+        _stacksRepo.GetStackByName("German")
+            .Returns(new CardStack
+            {
+                StackId = 1,
+                Name = "German"
+            });
+
+        _view.AskFlashcardContent().Returns(("Question", "Answer"));
+
+        _flashcardsRepo
+            .When(repo => repo.Add(Arg.Any<Flashcard>()))
+            .Do(_ => throw new Exception("Database error"));
+
+        _controller.AddCard();
+
+        _view.Received(1).DisplayError("Could not add flashcard: Database error");
+
+        _view.DidNotReceive().DisplayMessage("Flashcard added successfully.");
+    }
+
+    [Test]
     public void ViewCards_WhenStackExists_MapsCardsToDtosAndDisplaysThem()
     {
         ConfigureSelectedStack("German", 17);

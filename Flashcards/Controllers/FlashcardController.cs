@@ -47,22 +47,8 @@ public sealed class FlashcardController : IFlashcardController
     }
     public void AddCard()
     {
-        if (string.IsNullOrWhiteSpace(_currentStackName))
-        {
-            _flashcardsView.DisplayError("Select a stack first.");
+        if (!TryGetCurrentStack(out CardStack currentStack))
             return;
-        }
-
-        CardStack? currentStack;
-        try
-        {
-            currentStack = _stacksRepo.GetStackByName(_currentStackName);
-        }
-        catch (Exception ex)
-        {
-            _flashcardsView.DisplayError($"An error occurred while retrieving the stack: {ex.Message}");
-            return;
-        }
 
         if (currentStack == null)
         {
@@ -71,33 +57,30 @@ public sealed class FlashcardController : IFlashcardController
         }
 
         var (que, ans) = _flashcardsView.AskFlashcardContent();
-        _flashcardsRepo.Add(new Flashcard
+
+        bool addSuccess = RepositoryHelpers.TryExecute(
+            () => _flashcardsRepo.Add(
+                new Flashcard
+                {
+                    StackId = currentStack.StackId,
+                    Question = que,
+                    Answer = ans
+                }),
+                out Exception? ex
+        );
+        if (!addSuccess)
         {
-            StackId = currentStack.StackId,
-            Question = que,
-            Answer = ans
-        });
+            _flashcardsView.DisplayError($"Could not add flashcard: {ex!.Message}");
+            return;
+        }
+        _flashcardsView.DisplayMessage("Flashcard added successfully.");
     }
 
     public string ChangeStack() => _flashcardsView.SelectStack();
     public void DeleteCard()
     {
-        if (string.IsNullOrWhiteSpace(_currentStackName))
-        {
-            _flashcardsView.DisplayError("Select a stack first.");
+        if (!TryGetCurrentStack(out CardStack currentStack))
             return;
-        }
-
-        CardStack? currentStack;
-        try
-        {
-            currentStack = _stacksRepo.GetStackByName(_currentStackName);
-        }
-        catch (Exception ex)
-        {
-            _flashcardsView.DisplayError($"An error occurred while retrieving the stack: {ex.Message}");
-            return;
-        }
 
         if (currentStack == null)
         {
@@ -105,7 +88,11 @@ public sealed class FlashcardController : IFlashcardController
             return;
         }
 
-        IReadOnlyList<Flashcard> cards = _flashcardsRepo.GetAllByStackId(currentStack.StackId);
+        IReadOnlyList<Flashcard>? cards = SafeGet(
+                () => _flashcardsRepo.GetAllByStackId(currentStack.StackId)
+            );
+
+        if (cards == null) return;
         if (cards.Count == 0)
         {
             _flashcardsView.DisplayMessage("No flashcards found to delete.");
@@ -117,47 +104,34 @@ public sealed class FlashcardController : IFlashcardController
         _flashcardsView.DisplayFlashcards(dto);
 
         int selectedIndex;
+
         try
         {
             selectedIndex = _flashcardsView.AskFlashcardIndex(dto.Count);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _flashcardsView.DisplayError($"Invalid selection: {ex.Message}");
+            _flashcardsView.DisplayError($"Invalid selection: {e.Message}");
             return;
         }
 
         int cardId = cards[selectedIndex - 1].FlashcardId;
 
-        try
+        if (!RepositoryHelpers.TryExecute(
+            () => _flashcardsRepo.Delete(cardId),
+            out Exception? ex))
         {
-            _flashcardsRepo.Delete(cardId);
-            _flashcardsView.DisplayMessage("Flashcard deleted successfully.");
+            _flashcardsView.DisplayError($"Failed to delete flashcard: {ex!.Message}");
+            return;
         }
-        catch (Exception ex)
-        {
-            _flashcardsView.DisplayError($"Failed to delete flashcard: {ex.Message}");
-        }
+
+        _flashcardsView.DisplayMessage("Flashcard deleted successfully.");
     }
 
     public void EditCard()
     {
-        if (string.IsNullOrWhiteSpace(_currentStackName))
-        {
-            _flashcardsView.DisplayError("Select a stack first.");
+        if (!TryGetCurrentStack(out CardStack currentStack))
             return;
-        }
-
-        CardStack? currentStack;
-        try
-        {
-            currentStack = _stacksRepo.GetStackByName(_currentStackName);
-        }
-        catch (Exception ex)
-        {
-            _flashcardsView.DisplayError($"An error occurred while retrieving the stack: {ex.Message}");
-            return;
-        }
 
         if (currentStack == null)
         {
@@ -165,7 +139,11 @@ public sealed class FlashcardController : IFlashcardController
             return;
         }
 
-        IReadOnlyList<Flashcard> cards = _flashcardsRepo.GetAllByStackId(currentStack.StackId);
+        IReadOnlyList<Flashcard>? cards = SafeGet(
+                () => _flashcardsRepo.GetAllByStackId(currentStack.StackId)
+            );
+
+        if (cards == null) return;
         if (cards.Count == 0)
         {
             _flashcardsView.DisplayMessage("No flashcards found to edit.");
@@ -181,9 +159,9 @@ public sealed class FlashcardController : IFlashcardController
         {
             selectedIndex = _flashcardsView.AskFlashcardIndex(dto.Count);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            _flashcardsView.DisplayError($"Invalid selection: {ex.Message}");
+            _flashcardsView.DisplayError($"Invalid selection: {e.Message}");
             return;
         }
 
@@ -192,35 +170,21 @@ public sealed class FlashcardController : IFlashcardController
         selectedCard.Question = question;
         selectedCard.Answer = answer;
 
-        try
+        if (!RepositoryHelpers.TryExecute(
+            () => _flashcardsRepo.Update(selectedCard),
+            out Exception? ex))
         {
-            _flashcardsRepo.Update(selectedCard);
-            _flashcardsView.DisplayMessage("Flashcard updated successfully.");
+            _flashcardsView.DisplayError($"Failed to update flashcard: {ex!.Message}");
+            return;
         }
-        catch (Exception ex)
-        {
-            _flashcardsView.DisplayError($"Failed to update flashcard: {ex.Message}");
-        }
+        _flashcardsView.DisplayMessage("Flashcard updated successfully.");
+
     }
 
     public void ViewCards()
     {
-        if (string.IsNullOrWhiteSpace(_currentStackName))
-        {
-            _flashcardsView.DisplayError("Select a stack first.");
+        if (!TryGetCurrentStack(out CardStack currentStack))
             return;
-        }
-
-        CardStack? currentStack;
-        try
-        {
-            currentStack = _stacksRepo.GetStackByName(_currentStackName);
-        }
-        catch (Exception ex)
-        {
-            _flashcardsView.DisplayError($"An error occurred while retrieving the stack: {ex.Message}");
-            return;
-        }
 
         if (currentStack == null)
         {
@@ -228,7 +192,17 @@ public sealed class FlashcardController : IFlashcardController
             return;
         }
 
-        IReadOnlyList<Flashcard> cards = _flashcardsRepo.GetAllByStackId(currentStack.StackId);
+        IReadOnlyList<Flashcard>? cards = SafeGet(
+                () => _flashcardsRepo.GetAllByStackId(currentStack.StackId)
+            );
+
+        if (cards == null) return;
+        if (cards.Count == 0)
+        {
+            _flashcardsView.DisplayMessage("No flashcards found.");
+            _flashcardsView.WaitForInput();
+            return;
+        }
         MapCardsToDTO(cards, out List<FlashcardDTO> dto);
 
         _flashcardsView.DisplayFlashcards(dto);
@@ -249,5 +223,46 @@ public sealed class FlashcardController : IFlashcardController
             });
         }
     }
+    private IReadOnlyList<Flashcard>? SafeGet(Func<IReadOnlyList<Flashcard>> retrieval)
+    {
+        try
+        {
+            return retrieval();
+        }
+        catch (Exception ex)
+        {
+            _flashcardsView.DisplayError($"Unexpected error: {ex.Message}");
+            return null;
+        }
+    }
 
+    private bool TryGetCurrentStack(out CardStack currentStack)
+    {
+        currentStack = null!;
+
+        if (string.IsNullOrWhiteSpace(_currentStackName))
+        {
+            _flashcardsView.DisplayError("Select a stack first.");
+            return false;
+        }
+
+        try
+        {
+            CardStack? foundStack = _stacksRepo.GetStackByName(_currentStackName);
+
+            if (foundStack is null)
+            {
+                _flashcardsView.DisplayError($"Stack '{_currentStackName}' could not be found.");
+                return false;
+            }
+
+            currentStack = foundStack;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _flashcardsView.DisplayError($"An error occurred while retrieving the stack: {ex.Message}");
+            return false;
+        }
+    }
 }

@@ -25,26 +25,10 @@ public sealed class StudySessionController : IStudySessionController
     {
         string stackName = _view.AskForStackName();
 
-        CardStack? currentStack;
-
-        try
-        {
-            currentStack = _stacksRepo.GetStackByName(stackName);
-        }
-        catch (Exception ex)
-        {
-            _view.DisplayError($"Could not retrieve the stack: {ex.Message}");
+        if (!TryGetCurrentStack(stackName, out CardStack currentStack))
             return;
-        }
-
-        if (currentStack == null)
-        {
-            _view.DisplayError($"Stack '{stackName}' was not found.");
-            return;
-        }
 
         IReadOnlyList<Flashcard> cards;
-
         try
         {
             cards = _flashcardsRepo.GetAllByStackId(currentStack.StackId);
@@ -102,18 +86,49 @@ public sealed class StudySessionController : IStudySessionController
 
     public void ViewHistory()
     {
-        IReadOnlyList<StudySessionDTO> sessions;
+        IReadOnlyList<StudySessionDTO>? sessions = SafeGet(_studySessionsRepo.GetAll);
 
-        try
+        if (sessions is null)
         {
-            sessions = _studySessionsRepo.GetAll();
-        }
-        catch (Exception e)
-        {
-            _view.DisplayError($"Could not retrieve sessions: {e.Message}");
             return;
         }
 
         _view.DisplayAllStudySessions(sessions);
+    }
+
+    private IReadOnlyList<StudySessionDTO>? SafeGet(Func<IReadOnlyList<StudySessionDTO>> retrieval)
+    {
+        try
+        {
+            return retrieval();
+        }
+        catch (Exception ex)
+        {
+            _view.DisplayError($"Unexpected error: {ex.Message}");
+            return null;
+        }
+    }
+
+    private bool TryGetCurrentStack(string stackName, out CardStack currentStack)
+    {
+        currentStack = null!;
+        try
+        {
+            CardStack? foundStack = _stacksRepo.GetStackByName(stackName);
+
+            if (foundStack is null)
+            {
+                _view.DisplayError($"Stack '{stackName}' was not found.");
+                return false;
+            }
+
+            currentStack = foundStack;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _view.DisplayError($"Could not retrieve the stack: {ex.Message}");
+            return false;
+        }
     }
 }

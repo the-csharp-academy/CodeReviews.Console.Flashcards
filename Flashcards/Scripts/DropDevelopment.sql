@@ -1,0 +1,10 @@
+USE master;
+
+IF DB_ID(N'FlashcardsDB') IS NOT NULL
+BEGIN
+    ALTER DATABASE FlashcardsDB
+        SET SINGLE_USER
+        WITH ROLLBACK IMMEDIATE;
+
+    DROP DATABASE FlashcardsDB;
+END;
