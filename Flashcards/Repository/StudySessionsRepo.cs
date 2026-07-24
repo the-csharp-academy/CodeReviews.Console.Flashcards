@@ -48,7 +48,7 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
         if (session == null)
             throw new ArgumentNullException();
 
-        if (session.StackId <= 0)
+        if (session.StackId == null || session.StackId <= 0)
         {
             throw new ArgumentOutOfRangeException(
                 nameof(session.StackId));
