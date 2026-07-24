@@ -82,6 +82,7 @@ public sealed class StudySessionController : IStudySessionController
         var session = new StudySession
         {
             StackId = currentStack.StackId,
+            StackNameSnapshot = currentStack.Name,
             Score = score,
             TotalQuestions = cards.Count
         };

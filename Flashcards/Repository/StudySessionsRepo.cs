@@ -14,8 +14,8 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
         ValidateSession(session);
 
         const string sql = @"
-            INSERT INTO dbo.StudySessions(StackId, Score, TotalQuestions)
-            VALUES(@StackId, @Score, @TotalQuestions);
+            INSERT INTO dbo.StudySessions(StackId, StackNameSnapshot, Score, TotalQuestions)
+            VALUES(@StackId, @StackNameSnapshot, @Score, @TotalQuestions);
         ";
 
         using (var connection = _connectionFactory.CreateDatabaseConnection())
@@ -29,14 +29,12 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
     {
         const string sql = @"
             SELECT
-                s.Name AS StackName,
-                ss.Score,
-                ss.TotalQuestions,
-                ss.CompletedAt
-            FROM dbo.StudySessions ss
-            INNER JOIN dbo.Stacks s
-                ON s.StackId = ss.StackId
-            ORDER BY ss.CompletedAt DESC;
+                StackNameSnapshot AS StackName,
+                Score,
+                TotalQuestions,
+                CompletedAt
+            FROM dbo.StudySessions
+            ORDER BY CompletedAt DESC;
         ";
         using (var connection = _connectionFactory.CreateDatabaseConnection())
         {
@@ -67,6 +65,12 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
         {
             throw new ArgumentOutOfRangeException(
                 nameof(session.Score));
+        }
+        if (string.IsNullOrWhiteSpace(session.StackNameSnapshot))
+        {
+            throw new ArgumentException(
+                "Stack name snapshot cannot be empty.",
+                nameof(session));
         }
     }
 }

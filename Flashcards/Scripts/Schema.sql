@@ -64,7 +64,8 @@ BEGIN TRY
                 CREATE TABLE dbo.StudySessions
                 (
                     SessionId INT IDENTITY(1, 1) NOT NULL,
-                    StackId INT NOT NULL,
+                    StackId INT NULL,
+                    StackNameSnapshot NVARCHAR(100) NOT NULL,
                     Score INT NOT NULL,
                     TotalQuestions INT NOT NULL,
                     CompletedAt DATETIME2(0) NOT NULL
@@ -78,7 +79,10 @@ BEGIN TRY
                     CONSTRAINT FK_StudySessions_Stacks
                         FOREIGN KEY (StackId)
                         REFERENCES dbo.Stacks(StackId)
-                        ON DELETE NO ACTION,
+                        ON DELETE SET NULL,
+                    
+                    CONSTRAINT CK_StudySessions_StackNameSnapshot_NotEmpty
+                        CHECK (LEN(LTRIM(RTRIM(StackNameSnapshot))) > 0),
 
                     CONSTRAINT CK_StudySessions_TotalQuestions
                         CHECK (TotalQuestions > 0),
