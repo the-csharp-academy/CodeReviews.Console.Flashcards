@@ -50,15 +50,9 @@ public sealed class FlashcardController : IFlashcardController
         if (!TryGetCurrentStack(out CardStack currentStack))
             return;
 
-        if (currentStack == null)
-        {
-            _flashcardsView.DisplayError($"Stack '{_currentStackName}' could not be found.");
-            return;
-        }
-
         var (que, ans) = _flashcardsView.AskFlashcardContent();
 
-        bool addSuccess = RepositoryHelpers.TryExecute(
+        if (!RepositoryHelpers.TryExecute(
             () => _flashcardsRepo.Add(
                 new Flashcard
                 {
@@ -67,32 +61,22 @@ public sealed class FlashcardController : IFlashcardController
                     Answer = ans
                 }),
                 out Exception? ex
-        );
-        if (!addSuccess)
+        ))
         {
             _flashcardsView.DisplayError($"Could not add flashcard: {ex!.Message}");
             return;
         }
         _flashcardsView.DisplayMessage("Flashcard added successfully.");
     }
-
     public string ChangeStack() => _flashcardsView.SelectStack();
     public void DeleteCard()
     {
         if (!TryGetCurrentStack(out CardStack currentStack))
             return;
 
-        if (currentStack == null)
-        {
-            _flashcardsView.DisplayError($"Stack '{_currentStackName}' could not be found.");
+        if (!TryGetCards(currentStack.StackId, out IReadOnlyList<Flashcard> cards))
             return;
-        }
 
-        IReadOnlyList<Flashcard>? cards = SafeGet(
-                () => _flashcardsRepo.GetAllByStackId(currentStack.StackId)
-            );
-
-        if (cards == null) return;
         if (cards.Count == 0)
         {
             _flashcardsView.DisplayMessage("No flashcards found to delete.");
@@ -100,22 +84,10 @@ public sealed class FlashcardController : IFlashcardController
             return;
         }
 
-        MapCardsToDTO(cards, out List<FlashcardDTO> dto);
-        _flashcardsView.DisplayFlashcards(dto);
-
-        int selectedIndex;
-
-        try
-        {
-            selectedIndex = _flashcardsView.AskFlashcardIndex(dto.Count);
-        }
-        catch (Exception e)
-        {
-            _flashcardsView.DisplayError($"Invalid selection: {e.Message}");
+        if (!TrySelectCard(cards, out Flashcard selectedCard))
             return;
-        }
 
-        int cardId = cards[selectedIndex - 1].FlashcardId;
+        int cardId = selectedCard.FlashcardId;
 
         if (!RepositoryHelpers.TryExecute(
             () => _flashcardsRepo.Delete(cardId),
@@ -133,17 +105,9 @@ public sealed class FlashcardController : IFlashcardController
         if (!TryGetCurrentStack(out CardStack currentStack))
             return;
 
-        if (currentStack == null)
-        {
-            _flashcardsView.DisplayError($"Stack '{_currentStackName}' could not be found.");
+        if (!TryGetCards(currentStack.StackId, out IReadOnlyList<Flashcard> cards))
             return;
-        }
 
-        IReadOnlyList<Flashcard>? cards = SafeGet(
-                () => _flashcardsRepo.GetAllByStackId(currentStack.StackId)
-            );
-
-        if (cards == null) return;
         if (cards.Count == 0)
         {
             _flashcardsView.DisplayMessage("No flashcards found to edit.");
@@ -151,21 +115,9 @@ public sealed class FlashcardController : IFlashcardController
             return;
         }
 
-        MapCardsToDTO(cards, out List<FlashcardDTO> dto);
-        _flashcardsView.DisplayFlashcards(dto);
-
-        int selectedIndex;
-        try
-        {
-            selectedIndex = _flashcardsView.AskFlashcardIndex(dto.Count);
-        }
-        catch (Exception e)
-        {
-            _flashcardsView.DisplayError($"Invalid selection: {e.Message}");
+        if (!TrySelectCard(cards, out Flashcard selectedCard))
             return;
-        }
 
-        Flashcard selectedCard = cards[selectedIndex - 1];
         var (question, answer) = _flashcardsView.AskFlashcardContent();
         selectedCard.Question = question;
         selectedCard.Answer = answer;
@@ -186,17 +138,9 @@ public sealed class FlashcardController : IFlashcardController
         if (!TryGetCurrentStack(out CardStack currentStack))
             return;
 
-        if (currentStack == null)
-        {
-            _flashcardsView.DisplayError($"Stack '{_currentStackName}' could not be found.");
+        if (!TryGetCards(currentStack.StackId, out IReadOnlyList<Flashcard> cards))
             return;
-        }
 
-        IReadOnlyList<Flashcard>? cards = SafeGet(
-                () => _flashcardsRepo.GetAllByStackId(currentStack.StackId)
-            );
-
-        if (cards == null) return;
         if (cards.Count == 0)
         {
             _flashcardsView.DisplayMessage("No flashcards found.");
@@ -223,19 +167,21 @@ public sealed class FlashcardController : IFlashcardController
             });
         }
     }
-    private IReadOnlyList<Flashcard>? SafeGet(Func<IReadOnlyList<Flashcard>> retrieval)
+
+    private bool TryGetCards(int stackId, out IReadOnlyList<Flashcard> cards)
     {
+        cards = Array.Empty<Flashcard>();
         try
         {
-            return retrieval();
+            cards = _flashcardsRepo.GetAllByStackId(stackId);
+            return true;
         }
         catch (Exception ex)
         {
-            _flashcardsView.DisplayError($"Unexpected error: {ex.Message}");
-            return null;
+            _flashcardsView.DisplayError($"An error occurred while retrieving flashcards: {ex.Message}");
+            return false;
         }
     }
-
     private bool TryGetCurrentStack(out CardStack currentStack)
     {
         currentStack = null!;
@@ -262,6 +208,25 @@ public sealed class FlashcardController : IFlashcardController
         catch (Exception ex)
         {
             _flashcardsView.DisplayError($"An error occurred while retrieving the stack: {ex.Message}");
+            return false;
+        }
+    }
+
+    private bool TrySelectCard(IReadOnlyList<Flashcard> cards, out Flashcard selectedCard)
+    {
+        selectedCard = null!;
+        MapCardsToDTO(cards, out List<FlashcardDTO> dto);
+
+        _flashcardsView.DisplayFlashcards(dto);
+        try
+        {
+            int selectedIndex = _flashcardsView.AskFlashcardIndex(dto.Count);
+            selectedCard = cards[selectedIndex - 1];
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _flashcardsView.DisplayError($"Invalid selection: {ex.Message}");
             return false;
         }
     }

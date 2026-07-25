@@ -83,7 +83,7 @@ public sealed class FlashcardsView : IFlashcardsView
 
     public int AskFlashcardIndex(int maxIndex)
         => AnsiConsole.Prompt(
-            new TextPrompt<int>("Enter the flashcard number to delete:")
+            new TextPrompt<int>("Enter the flashcard number:")
                 .Validate(value => value < 1 || value > maxIndex
                     ? ValidationResult.Error($"[red]Please enter a number between 1 and {maxIndex}.[/]")
                     : ValidationResult.Success()));

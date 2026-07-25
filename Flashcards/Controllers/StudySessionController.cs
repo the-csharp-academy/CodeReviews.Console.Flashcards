@@ -28,21 +28,12 @@ public sealed class StudySessionController : IStudySessionController
         if (!TryGetCurrentStack(stackName, out CardStack currentStack))
             return;
 
-        IReadOnlyList<Flashcard> cards;
-        try
-        {
-            cards = _flashcardsRepo.GetAllByStackId(currentStack.StackId);
-        }
-        catch (Exception ex)
-        {
-            _view.DisplayError($"Could not retrieve flashcards: {ex.Message}");
+        if (!TryGetCards(currentStack.StackId, out IReadOnlyList<Flashcard> cards))
             return;
-        }
 
         if (cards.Count == 0)
         {
             _view.DisplayMessage($"Stack '{currentStack.Name}' has no flashcards.");
-
             return;
         }
 
@@ -63,21 +54,17 @@ public sealed class StudySessionController : IStudySessionController
             _view.ShowAnswer(isCorrect, card.Answer);
         }
 
-        var session = new StudySession
+        if (!RepositoryHelpers.TryExecute(
+            () => _studySessionsRepo.Add(new StudySession
+            {
+                StackId = currentStack.StackId,
+                StackNameSnapshot = currentStack.Name,
+                Score = score,
+                TotalQuestions = cards.Count
+            }),
+            out Exception? exception))
         {
-            StackId = currentStack.StackId,
-            StackNameSnapshot = currentStack.Name,
-            Score = score,
-            TotalQuestions = cards.Count
-        };
-
-        try
-        {
-            _studySessionsRepo.Add(session);
-        }
-        catch (Exception ex)
-        {
-            _view.DisplayError($"The result could not be saved: {ex.Message}");
+            _view.DisplayError($"The result could not be saved: {exception!.Message}");
             return;
         }
 
@@ -86,26 +73,23 @@ public sealed class StudySessionController : IStudySessionController
 
     public void ViewHistory()
     {
-        IReadOnlyList<StudySessionDTO>? sessions = SafeGet(_studySessionsRepo.GetAll);
-
-        if (sessions is null)
-        {
+        if (!TryGetStudySessions(out IReadOnlyList<StudySessionDTO> sessions))
             return;
-        }
 
         _view.DisplayAllStudySessions(sessions);
     }
-
-    private IReadOnlyList<StudySessionDTO>? SafeGet(Func<IReadOnlyList<StudySessionDTO>> retrieval)
+    private bool TryGetCards(int stackId, out IReadOnlyList<Flashcard> cards)
     {
+        cards = Array.Empty<Flashcard>();
         try
         {
-            return retrieval();
+            cards = _flashcardsRepo.GetAllByStackId(stackId);
+            return true;
         }
         catch (Exception ex)
         {
-            _view.DisplayError($"Unexpected error: {ex.Message}");
-            return null;
+            _view.DisplayError($"An error occurred while retrieving flashcards: {ex.Message}");
+            return false;
         }
     }
 
@@ -128,6 +112,21 @@ public sealed class StudySessionController : IStudySessionController
         catch (Exception ex)
         {
             _view.DisplayError($"Could not retrieve the stack: {ex.Message}");
+            return false;
+        }
+    }
+
+    private bool TryGetStudySessions(out IReadOnlyList<StudySessionDTO> sessions)
+    {
+        sessions = Array.Empty<StudySessionDTO>();
+        try
+        {
+            sessions = _studySessionsRepo.GetAll();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _view.DisplayError($"Could not retrieve sessions: {ex.Message}");
             return false;
         }
     }

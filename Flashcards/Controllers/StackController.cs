@@ -41,96 +41,106 @@ public sealed class StackController : IStackController
     }
     public void AddStack()
     {
-        try
+        string stackName = _stacksView.AskForStackName();
+        if (!RepositoryHelpers.TryExecute(
+            () => _stacksRepo.Add(stackName),
+            out Exception? exception))
         {
-            _stacksRepo.Add(_stacksView.AskForStackName());
+            _stacksView.DisplayError($"Could not add stack: {exception!.Message}");
+            return;
         }
-        catch (ArgumentNullException e)
-        {
-            _stacksView.DisplayError("Stack name cannot be null" + e.Message);
-        }
+
+        _stacksView.DisplayMessage("Stack added successfully.");
     }
 
     public void DeleteStack()
     {
-        CardStack? stackToDelete;
-        string enteredName = _stacksView.AskForStackName();
-        try
+        string stackName = _stacksView.AskForStackName();
+        if (!TryGetStackByName(stackName, out CardStack stackToDelete))
+            return;
+
+        if (!RepositoryHelpers.TryExecute(
+                () => _stacksRepo.Delete(stackToDelete.StackId),
+                out Exception? exception))
         {
-            stackToDelete = _stacksRepo.GetStackByName(enteredName);
-            if (stackToDelete == null)
-            {
-                _stacksView.DisplayError($"Stack named {enteredName} could not be found");
-                return;
-            }
-            _stacksRepo.Delete(stackToDelete.StackId);
+            _stacksView.DisplayError($"Could not delete stack: {exception!.Message}");
+            return;
         }
-        catch (ArgumentNullException e)
-        {
-            _stacksView.DisplayError("Stack name cannot be null " + e.Message);
-        }
-        catch (Exception e)
-        {
-            _stacksView.DisplayError("Some error occured " + e.Message);
-        }
+
+        _stacksView.DisplayMessage("Stack deleted successfully.");
     }
 
     public void EditStack()
     {
-        CardStack? stackToEdit;
-        string enteredName = _stacksView.AskForStackName();
-        try
+        string currentName = _stacksView.AskForStackName();
+        if (!TryGetStackByName(currentName, out CardStack stackToEdit))
+            return;
+
+        string newName = _stacksView.AskForStackName();
+
+        if (!RepositoryHelpers.TryExecute(
+                () => _stacksRepo.Update(stackToEdit.StackId, newName),
+                out Exception? exception))
         {
-            stackToEdit = _stacksRepo.GetStackByName(enteredName);
-            if (stackToEdit == null)
-            {
-                _stacksView.DisplayError($"Stack named {enteredName} could not be found");
-                return;
-            }
-            enteredName = _stacksView.AskForStackName();
-            _stacksRepo.Update(stackToEdit.StackId, enteredName);
+            _stacksView.DisplayError($"Could not update stack: {exception!.Message}");
+            return;
         }
-        catch (ArgumentNullException e)
-        {
-            _stacksView.DisplayError("Stack name cannot be null " + e.Message);
-        }
-        catch (Exception e)
-        {
-            _stacksView.DisplayError("Some error occured " + e.Message);
-        }
+
+        _stacksView.DisplayMessage("Stack updated successfully.");
     }
 
     public void ViewStacks()
     {
-        IReadOnlyList<CardStack>? stacks = SafeGet(_stacksRepo.GetAll);
-
-        if (stacks == null) return;
-
+        if (!TryGetAllStacks(out IReadOnlyList<CardStack> stacks))
+            return;
         var dto = MapCardStacksToDTO(stacks);
         _stacksView.DisplayStacks(dto);
     }
 
-    private IReadOnlyList<CardStackDTO> MapCardStacksToDTO(IReadOnlyList<CardStack> stacks)
+    private static IReadOnlyList<CardStackDTO> MapCardStacksToDTO(IReadOnlyList<CardStack> stacks)
     {
         List<CardStackDTO> dto = new();
         foreach (var item in stacks)
         {
-            dto.Add(new CardStackDTO { Name = item.Name, });
+            dto.Add(new CardStackDTO { Name = item.Name });
         }
 
-        return dto.AsReadOnly<CardStackDTO>();
+        return dto.AsReadOnly();
     }
-
-    private List<CardStack>? SafeGet(Func<List<CardStack>> retrieval)
+    private bool TryGetAllStacks(out IReadOnlyList<CardStack> stacks)
     {
+        stacks = Array.Empty<CardStack>();
         try
         {
-            return retrieval();
+            stacks = _stacksRepo.GetAll();
+            return true;
         }
         catch (Exception ex)
         {
-            _stacksView.DisplayError($"Unexpected error: {ex.Message}");
-            return null;
+            _stacksView.DisplayError($"An error occurred while retrieving stacks: {ex.Message}");
+            return false;
+        }
+    }
+
+    private bool TryGetStackByName(string stackName, out CardStack stack)
+    {
+        stack = null!;
+        try
+        {
+            CardStack? foundStack = _stacksRepo.GetStackByName(stackName);
+            if (foundStack == null)
+            {
+                _stacksView.DisplayError($"Stack '{stackName}' could not be found.");
+                return false;
+            }
+
+            stack = foundStack;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _stacksView.DisplayError($"Could not retrieve stack: {ex.Message}");
+            return false;
         }
     }
 }

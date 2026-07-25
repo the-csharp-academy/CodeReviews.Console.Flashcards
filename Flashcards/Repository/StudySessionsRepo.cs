@@ -34,7 +34,7 @@ public sealed class StudySessionsRepo : IStudySessionsRepo
                 TotalQuestions,
                 CompletedAt
             FROM dbo.StudySessions
-            ORDER BY CompletedAt DESC;
+            ORDER BY CompletedAt DESC, SessionId DESC;
         ";
         using (var connection = _connectionFactory.CreateDatabaseConnection())
         {
