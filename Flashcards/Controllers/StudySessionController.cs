@@ -88,7 +88,7 @@ public sealed class StudySessionController : IStudySessionController
         }
         catch (Exception ex)
         {
-            _view.DisplayError($"An error occurred while retrieving flashcards: {ex.Message}");
+            _view.DisplayError($"Could not retrieve flashcards: {ex.Message}");
             return false;
         }
     }

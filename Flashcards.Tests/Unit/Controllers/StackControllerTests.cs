@@ -22,11 +22,13 @@ public sealed class StackControllerTests
     }
 
     [Test]
-    public void AddStack_UsesNameReturnedByView()
+    public void AddStack_WhenRepositorySucceeds_AddsStackAndDisplaysSuccess()
     {
         _view.AskForStackName().Returns("German");
         _controller.AddStack();
         _repository.Received(1).Add("German");
+        _view.Received(1).DisplayMessage("Stack added successfully.");
+        _view.DidNotReceive().DisplayError(Arg.Any<string>());
     }
 
     [Test]
@@ -67,14 +69,11 @@ public sealed class StackControllerTests
     public void DeleteStack_WhenStackDoesNotExist_DisplaysErrorAndDoesNotDelete()
     {
         _view.AskForStackName().Returns("Missing");
-
         _repository.GetStackByName("Missing").Returns((CardStack?)null);
-
         _controller.DeleteStack();
-
-        _view.Received(1).DisplayError("Stack named Missing could not be found");
-
+        _view.Received(1).DisplayError("Stack 'Missing' could not be found.");
         _repository.DidNotReceive().Delete(Arg.Any<int>());
+        _view.DidNotReceive().DisplayMessage("Stack deleted successfully.");
     }
 
     [Test]
@@ -82,7 +81,6 @@ public sealed class StackControllerTests
     {
         // first for the current name, then for the new name.
         _view.AskForStackName().Returns("Old name", "New name");
-
         _repository.GetStackByName("Old name")
             .Returns(new CardStack
             {
@@ -91,23 +89,18 @@ public sealed class StackControllerTests
             });
 
         _controller.EditStack();
-
         _repository.Received(1).Update(7, "New name");
     }
     [Test]
     public void EditStack_WhenStackDoesNotExist_DisplaysErrorAndDoesNotUpdate()
     {
         _view.AskForStackName().Returns("Missing");
-
         _repository.GetStackByName("Missing").Returns((CardStack?)null);
-
         _controller.EditStack();
-
-        _view.Received(1).DisplayError("Stack named Missing could not be found");
-
-        _repository.DidNotReceive().Update(Arg.Any<int>(), Arg.Any<string>());
-
+        _view.Received(1).DisplayError("Stack 'Missing' could not be found.");
         _view.Received(1).AskForStackName();
+        _repository.DidNotReceive().Update(Arg.Any<int>(), Arg.Any<string>());
+        _view.DidNotReceive().DisplayMessage("Stack updated successfully.");
     }
 
     [Test]
@@ -118,9 +111,7 @@ public sealed class StackControllerTests
             .Do(_ => throw new Exception("Database unavailable"));
 
         _controller.ViewStacks();
-
-        _view.Received(1).DisplayError("Unexpected error: Database unavailable");
-
+        _view.Received(1).DisplayError("Could not retrieve stacks: Database unavailable");
         _view.DidNotReceive().DisplayStacks(Arg.Any<IReadOnlyList<CardStackDTO>>());
     }
 
@@ -159,17 +150,21 @@ public sealed class StackControllerTests
     }
 
     [Test]
-    public void AddStack_WhenRepositoryThrowsArgumentNullException_DisplaysError()
+    public void Run_WhenOptionIsUnknown_ThrowsArgumentOutOfRangeException()
+    {
+        _view.ShowStacksOption().Returns((StacksOption)999);
+        Assert.Throws<ArgumentOutOfRangeException>(() => _controller.Run());
+    }
+
+    [Test]
+    public void AddStack_WhenRepositoryThrows_DisplaysErrorAndNotSuccess()
     {
         _view.AskForStackName().Returns("German");
-
         var exception = new ArgumentNullException("name", "The stack name was null.");
-
         _repository.When(repository => repository.Add("German")).Do(_ => throw exception);
-
-        Assert.DoesNotThrow(() => _controller.AddStack());
-
-        _view.Received(1).DisplayError("Stack name cannot be null" + exception.Message);
+        _controller.AddStack();
+        _view.Received(1).DisplayError($"Could not add stack: {exception.Message}");
+        _view.DidNotReceive().DisplayMessage("Stack added successfully.");
     }
 
     [Test]
@@ -194,5 +189,20 @@ public sealed class StackControllerTests
         _view.Received(1).DisplayError(
             Arg.Is<string>(message => message != null &&
                 message.Contains("Database delete failed.")));
+    }
+
+    [Test]
+    public void EditStack_WhenStackLookupThrows_DisplaysErrorAndDoesNotUpdate()
+    {
+        _view.AskForStackName().Returns("German");
+        _repository.GetStackByName("German").Returns(_ => throw new InvalidOperationException("Lookup failed."));
+
+        _controller.EditStack();
+
+        _view.Received(1).DisplayError("Could not retrieve stack: Lookup failed.");
+        _view.Received(1).AskForStackName();
+        _repository.DidNotReceive().Update(
+                Arg.Any<int>(),
+                Arg.Any<string>());
     }
 }

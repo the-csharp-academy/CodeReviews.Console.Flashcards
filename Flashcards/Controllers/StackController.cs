@@ -117,7 +117,7 @@ public sealed class StackController : IStackController
         }
         catch (Exception ex)
         {
-            _stacksView.DisplayError($"An error occurred while retrieving stacks: {ex.Message}");
+            _stacksView.DisplayError($"Could not retrieve stacks: {ex.Message}");
             return false;
         }
     }
