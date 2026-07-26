@@ -1,5 +1,4 @@
 using NSubstitute;
-using NUnit.Framework;
 
 namespace CodeReviews.Console.Flashcards.Tests;
 
@@ -99,7 +98,7 @@ public sealed class StudySessionControllerTests
     }
 
     [Test]
-    public void Study_WhenAnswersAreMixed_SavesScoreAndStackSnapshot()
+    public void Study_WhenAnswersAreMixed_SavesCorrectSessionResult()
     {
         ConfigureStack("German", 17);
 
@@ -142,11 +141,65 @@ public sealed class StudySessionControllerTests
                 Arg.Is<StudySession>(session =>
                     session != null &&
                     session.StackId == 17 &&
-                    session.StackNameSnapshot == "German" &&
                     session.Score == 2 &&
                     session.TotalQuestions == 3));
 
         _view.Received(1).ShowFinalResult(2, 3);
+    }
+
+    [Test]
+    public void Study_WhenAllAnswersAreIncorrect_SavesZeroScore()
+    {
+        ConfigureStack("German", 17);
+
+        _flashcardsRepo.GetAllByStackId(17)
+            .Returns(new List<Flashcard>
+                {
+                    new()
+                    {
+                        FlashcardId = 1,
+                        StackId = 17,
+                        Question = "Haus",
+                        Answer = "House"
+                    },
+                    new()
+                    {
+                        FlashcardId = 2,
+                        StackId = 17,
+                        Question = "Baum",
+                        Answer = "Tree"
+                    }
+                });
+
+        _view.TakeAnswerFromUser().Returns("Wrong", "Also wrong");
+
+        _answerChecker.IsCorrect("Wrong", "House").Returns(false);
+        _answerChecker.IsCorrect("Also wrong", "Tree").Returns(false);
+
+        _controller.Study();
+
+        _studySessionsRepo.Received(1).Add(
+                Arg.Is<StudySession>(session =>
+                    session != null &&
+                    session.StackId == 17 &&
+                    session.Score == 0 &&
+                    session.TotalQuestions == 2));
+
+        _view.Received(1).ShowFinalResult(0, 2);
+    }
+
+    [Test]
+    public void ViewHistory_WhenNoSessionsExist_DisplaysEmptyHistory()
+    {
+        IReadOnlyList<StudySessionDTO> sessions = Array.Empty<StudySessionDTO>();
+
+        _studySessionsRepo.GetAll().Returns(sessions);
+        _controller.ViewHistory();
+        _view.Received(1).DisplayAllStudySessions(
+                Arg.Is<IReadOnlyList<StudySessionDTO>>(
+                    result => result != null && result.Count == 0));
+
+        _view.DidNotReceive().DisplayError(Arg.Any<string>());
     }
 
     [Test]

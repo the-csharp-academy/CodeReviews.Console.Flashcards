@@ -1,6 +1,5 @@
 using Dapper;
 using Microsoft.Data.SqlClient;
-using NUnit.Framework;
 
 namespace CodeReviews.Console.Flashcards.Tests;
 

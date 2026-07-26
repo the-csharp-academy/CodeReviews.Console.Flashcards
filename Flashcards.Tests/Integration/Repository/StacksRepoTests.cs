@@ -2,7 +2,6 @@ using CodeReviews.Console.Flashcards;
 using CodeReviews.Console.Flashcards.Tests;
 using Dapper;
 using Microsoft.Data.SqlClient;
-using NUnit.Framework;
 
 namespace Flashcards.Tests;
 

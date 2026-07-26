@@ -1,6 +1,4 @@
-using CodeReviews.Console.Flashcards;
 using NSubstitute;
-using NUnit.Framework;
 
 namespace CodeReviews.Console.Flashcards.Tests;
 

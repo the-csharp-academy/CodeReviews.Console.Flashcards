@@ -60,7 +60,6 @@ public sealed class StudySessionController : IStudySessionController
             () => _studySessionsRepo.Add(new StudySession
             {
                 StackId = currentStack.StackId,
-                StackNameSnapshot = currentStack.Name,
                 Score = score,
                 TotalQuestions = cards.Count
             }),
