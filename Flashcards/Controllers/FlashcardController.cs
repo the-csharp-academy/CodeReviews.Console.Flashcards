@@ -1,3 +1,5 @@
+using Spectre.Console;
+
 public sealed class FlashcardController : IFlashcardController
 {
     private readonly IFlashcardsView _flashcardsView;
@@ -18,8 +20,8 @@ public sealed class FlashcardController : IFlashcardController
         bool isRunning = true;
         while (isRunning)
         {
-            _flashcardsView.DisplayMessage($"Current stack name: {_currentStackName ?? "-"}");
             FlashcardsOption selectedOption = _flashcardsView.ShowFlashcardsOption();
+            _flashcardsView.DisplayMessage($"\nCurrent stack name: {_currentStackName ?? "-"}");
             switch (selectedOption)
             {
                 case FlashcardsOption.ChangeStack:

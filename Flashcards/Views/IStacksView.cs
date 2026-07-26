@@ -5,5 +5,6 @@ public interface IStacksView
     StacksOption ShowStacksOption();
     void DisplayStacks(IReadOnlyList<CardStackDTO> stacks);
     string AskForStackName();
+    void WaitForInput();
 
 }

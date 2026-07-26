@@ -1,3 +1,5 @@
+using Spectre.Console;
+
 public sealed class StackController : IStackController
 {
     private readonly IStacksView _stacksView;
@@ -95,6 +97,7 @@ public sealed class StackController : IStackController
             return;
         var dto = MapCardStacksToDTO(stacks);
         _stacksView.DisplayStacks(dto);
+        _stacksView.WaitForInput();
     }
 
     private static IReadOnlyList<CardStackDTO> MapCardStacksToDTO(IReadOnlyList<CardStack> stacks)

@@ -1,3 +1,5 @@
+using Spectre.Console;
+
 namespace CodeReviews.Console.Flashcards;
 
 public sealed class AppController

@@ -39,10 +39,14 @@ public sealed class FlashcardsView : IFlashcardsView
     public void DisplayMessage(string message) => AnsiConsole.MarkupLine(Markup.Escape(message));
 
     public FlashcardsOption ShowFlashcardsOption()
-        => AnsiConsole.Prompt(
-            new SelectionPrompt<FlashcardsOption>()
-                .Title("\nWhat's next?")
-                .AddChoices(Enum.GetValues<FlashcardsOption>()));
+    {
+        AnsiConsole.Clear();
+        return AnsiConsole.Prompt(
+        new SelectionPrompt<FlashcardsOption>()
+            .Title("\nWhat's next?")
+            .AddChoices(Enum.GetValues<FlashcardsOption>())
+            .UseConverter(FormatOption));
+    }
     public void WaitForInput()
     {
         AnsiConsole.MarkupLine("\n[grey]Press any key to continue.[/]");
@@ -87,4 +91,17 @@ public sealed class FlashcardsView : IFlashcardsView
                 .Validate(value => value < 1 || value > maxIndex
                     ? ValidationResult.Error($"[red]Please enter a number between 1 and {maxIndex}.[/]")
                     : ValidationResult.Success()));
+
+    private static string FormatOption(FlashcardsOption option)
+        => option switch
+        {
+            FlashcardsOption.ChangeStack => "Change stack",
+            FlashcardsOption.ViewFlashcards => "View flashcards",
+            FlashcardsOption.AddFlashcards => "Add flashcard",
+            FlashcardsOption.EditFlashcards => "Edit flashcard",
+            FlashcardsOption.DeleteFlashcards => "Delete flashcard",
+            FlashcardsOption.Back => "Back",
+            _ => throw new ArgumentOutOfRangeException(nameof(option), option, null)
+        };
+
 }

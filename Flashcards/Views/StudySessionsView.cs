@@ -5,14 +5,16 @@ namespace CodeReviews.Console.Flashcards;
 public sealed class StudySessionsView : IStudySessionsView
 {
     public string AskForStackName()
-        => AnsiConsole.Prompt(
+    {
+        AnsiConsole.Clear();
+        return AnsiConsole.Prompt(
             new TextPrompt<string>("Enter the stack name:")
             .Validate(name =>
                 string.IsNullOrWhiteSpace(name) ?
                 ValidationResult.Error("[red]Stack name cannot be empty.[/]") :
                 ValidationResult.Success())
         ).Trim();
-
+    }
     public void DisplayError(string message)
     {
         AnsiConsole.MarkupLine($"[red]{Markup.Escape(message)}[/]");

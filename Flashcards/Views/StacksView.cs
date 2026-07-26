@@ -40,14 +40,29 @@ public sealed class StacksView : IStacksView
     }
 
     public StacksOption ShowStacksOption()
-        => AnsiConsole.Prompt(
-            new SelectionPrompt<StacksOption>()
-                .Title("\nWhat's next?")
-                .AddChoices(Enum.GetValues<StacksOption>()));
+    {
+        AnsiConsole.Clear();
+        return AnsiConsole.Prompt(
+        new SelectionPrompt<StacksOption>()
+            .Title("\nWhat's next?")
+            .AddChoices(Enum.GetValues<StacksOption>())
+            .UseConverter(FormatOption));
+    }
 
-    private static void WaitForInput()
+    public void WaitForInput()
     {
         AnsiConsole.MarkupLine("\n[grey]Press any key to continue.[/]");
         AnsiConsole.Console.Input.ReadKey(true);
     }
+
+    private static string FormatOption(StacksOption option)
+        => option switch
+        {
+            StacksOption.ViewStacks => "View stacks",
+            StacksOption.AddStacks => "Add stack",
+            StacksOption.EditStacks => "Edit stack",
+            StacksOption.DeleteStacks => "Delete stack",
+            StacksOption.Back => "Back",
+            _ => throw new ArgumentOutOfRangeException(nameof(option), option, null)
+        };
 }
