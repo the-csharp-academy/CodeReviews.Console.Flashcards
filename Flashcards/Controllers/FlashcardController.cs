@@ -12,6 +12,9 @@ public sealed class FlashcardController : IFlashcardController
     }
     public void Run()
     {
+        if (!TrySelectStack())
+            return;
+
         bool isRunning = true;
         while (isRunning)
         {
@@ -20,7 +23,7 @@ public sealed class FlashcardController : IFlashcardController
             switch (selectedOption)
             {
                 case FlashcardsOption.ChangeStack:
-                    _currentStackName = ChangeStack();
+                    TrySelectStack();
                     break;
                 case FlashcardsOption.ViewFlashcards:
                     ViewCards();
@@ -68,7 +71,6 @@ public sealed class FlashcardController : IFlashcardController
         }
         _flashcardsView.DisplayMessage("Flashcard added successfully.");
     }
-    public string ChangeStack() => _flashcardsView.SelectStack();
     public void DeleteCard()
     {
         if (!TryGetCurrentStack(out CardStack currentStack))
@@ -227,6 +229,29 @@ public sealed class FlashcardController : IFlashcardController
         catch (Exception ex)
         {
             _flashcardsView.DisplayError($"Invalid selection: {ex.Message}");
+            return false;
+        }
+    }
+
+    private bool TrySelectStack()
+    {
+        string stackName = _flashcardsView.SelectStack();
+        try
+        {
+            CardStack? stack = _stacksRepo.GetStackByName(stackName);
+
+            if (stack is null)
+            {
+                _flashcardsView.DisplayError($"Stack '{stackName}' could not be found.");
+                return false;
+            }
+
+            _currentStackName = stack.Name;
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _flashcardsView.DisplayError($"Could not retrieve stack: {ex.Message}");
             return false;
         }
     }

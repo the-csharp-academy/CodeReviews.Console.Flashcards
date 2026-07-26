@@ -304,20 +304,24 @@ public sealed class FlashcardControllerTests
     }
 
     [Test]
-    public void Run_WhenBackIsSelected_ReturnsWithoutCallingCrudMethods()
+    public void Run_WhenStackIsSelectedAndBackIsSelected_ReturnsWithoutCallingCrudMethods()
     {
+        _view.SelectStack().Returns("German");
+        _stacksRepo.GetStackByName("German").Returns(new CardStack
+        {
+            StackId = 1,
+            Name = "German"
+        });
         _view.ShowFlashcardsOption().Returns(FlashcardsOption.Back);
-
         _controller.Run();
+        _view.Received(1).SelectStack();
+        _stacksRepo.Received(1).GetStackByName("German");
 
         _view.Received(1).ShowFlashcardsOption();
 
         _flashcardsRepo.DidNotReceive().GetAllByStackId(Arg.Any<int>());
-
         _flashcardsRepo.DidNotReceive().Add(Arg.Any<Flashcard>());
-
         _flashcardsRepo.DidNotReceive().Update(Arg.Any<Flashcard>());
-
         _flashcardsRepo.DidNotReceive().Delete(Arg.Any<int>());
     }
 
