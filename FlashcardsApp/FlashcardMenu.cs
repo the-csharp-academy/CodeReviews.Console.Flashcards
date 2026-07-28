@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FlashcardsApp.DTOs;
 using FlashcardsApp.Models;
 using FlashcardsApp.Repositories;
@@ -69,11 +69,26 @@ namespace FlashcardsApp
                     return;
                 }
 
+                bool handled = false;
                 while (!int.TryParse(inp, out c) || c < 0 || c > list.Count)
                 {
+                    if (inp != null && (inp.Trim() == "A" || inp.Trim() == "a"))
+                    {
+                        CreateNewFlashcard();
+                        handled = true;
+                        break;
+                    }
+                    if (inp != null && (inp.Trim() == "S" || inp.Trim() == "s"))
+                    {
+                        Study(list);
+                        handled = true;
+                        break;
+                    }
                     Console.Write("\nPlease enter a valid number.\nTry again:\t");
                     inp = Console.ReadLine();
                 }
+
+                if (handled) return;
 
                 if (c != 0)
                 {
@@ -122,7 +137,7 @@ namespace FlashcardsApp
 
                 if (isSuccess)
                 {
-                    Console.WriteLine("\nCreated new stack successfully!");
+                    Console.WriteLine("\nCreated new flashcard successfully!");
                 }
                 else
                 {
@@ -222,12 +237,10 @@ namespace FlashcardsApp
                     Console.WriteLine("\nError! Please try again!");
                 }
             }
-
             catch (Exception e)
             {
                 Console.WriteLine($"Error occured: {e.Message}");
             }
-
             finally
             {
                 Console.WriteLine("\nPress ENTER to continue: ");

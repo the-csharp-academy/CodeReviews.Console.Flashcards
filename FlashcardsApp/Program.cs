@@ -1,4 +1,5 @@
-﻿using FlashcardsApp.Repositories;
+using FlashcardsApp.Repositories;
+using Microsoft.Extensions.Configuration;
 
 namespace FlashcardsApp
 {
@@ -6,8 +7,15 @@ namespace FlashcardsApp
     {
         public static void Main(string[] args)
         {
-            InitDatabase.CreateDatabase();
-            string connectionString = "Server=.;Database=Flashcard;Trusted_Connection=True;TrustServerCertificate=True;";
+            IConfiguration configuration = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .Build();
+
+            string connectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in appsettings.json.");
+
+            InitDatabase.CreateDatabase(configuration);
             Menu menu = new Menu(connectionString);
         }
     }

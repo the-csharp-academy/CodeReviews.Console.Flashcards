@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
 
 namespace FlashcardsApp.Repositories
 {
@@ -38,7 +39,7 @@ namespace FlashcardsApp.Repositories
                 BEGIN
                     CREATE TABLE dbo.Stacks (
                         Id INT PRIMARY KEY IDENTITY(1,1),
-                        Name VARCHAR(100)
+                        Name VARCHAR(100) UNIQUE
                     );
                 END
             ";
@@ -60,13 +61,12 @@ namespace FlashcardsApp.Repositories
             ";
         }
 
-        private static void CreateTables()
+        private static void CreateTables(string connectionString)
         {
             string strCreateTableFlashcard = CreateFlashcardTableQuery();
             string strCreateTableStack = CreateStackTableQuery();
             string strCreateTableSession = CreateSessionTableQuery();
 
-            string connectionString = "Server=.;Database=Flashcard;Trusted_Connection=True;TrustServerCertificate=True;";
             try
             {
                 using (var conn = new SqlConnection(connectionString))
@@ -84,15 +84,19 @@ namespace FlashcardsApp.Repositories
             }
         }
 
-        internal static void CreateDatabase()
+        internal static void CreateDatabase(IConfiguration configuration)
         {
             string strCreateDatabase = CreateDatabaseQuery();
 
-            string connectionString = "Server=.;Trusted_Connection=True;TrustServerCertificate=True;";
+            string masterConnectionString = configuration.GetConnectionString("MasterConnection")
+                ?? throw new InvalidOperationException("Connection string 'MasterConnection' not found in appsettings.json.");
+
+            string defaultConnectionString = configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found in appsettings.json.");
 
             try
             {
-                using (var conn = new SqlConnection(connectionString))
+                using (var conn = new SqlConnection(masterConnectionString))
                 {
                     var command = new SqlCommand(strCreateDatabase, conn);
                     conn.Open();
@@ -105,7 +109,7 @@ namespace FlashcardsApp.Repositories
                 Console.WriteLine($"Failed to create database: {ex.Message}");
             }
 
-            CreateTables();
+            CreateTables(defaultConnectionString);
         }
     }
 }

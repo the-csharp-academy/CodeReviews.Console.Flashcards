@@ -1,4 +1,4 @@
-﻿using FlashcardsApp.DTOs;
+using FlashcardsApp.DTOs;
 using FlashcardsApp.Models;
 using Microsoft.Data.SqlClient;
 
@@ -30,15 +30,20 @@ namespace FlashcardsApp.Repositories
             }
         }
 
-        public List<int> GetStatByMonth(int year)
+        public Dictionary<string, List<int>> GetStatByMonth(int year)
         {
-            var list = new List<(int Month, int Count)>();
-            var res = new List<int>(new int[12]);
-            string query = "SELECT MONTH(Date), COUNT(*) FROM Sessions WHERE YEAR(Date) = @Year GROUP BY MONTH(Date) ORDER BY MONTH(Date) ASC;";
+            var result = new Dictionary<string, List<int>>();
+            string query = @"
+                SELECT s.Name, MONTH(ss.Date), COUNT(*)
+                FROM Sessions ss
+                INNER JOIN Stacks s ON ss.StackId = s.Id
+                WHERE YEAR(ss.Date) = @Year
+                GROUP BY s.Name, MONTH(ss.Date)
+                ORDER BY s.Name, MONTH(ss.Date) ASC;";
 
             using (var conn = new SqlConnection(_connectionString))
             {
-                var command = new SqlCommand(query,conn);
+                var command = new SqlCommand(query, conn);
                 command.Parameters.AddWithValue("@Year", year);
                 conn.Open();
 
@@ -46,15 +51,19 @@ namespace FlashcardsApp.Repositories
                 {
                     while (reader.Read())
                     {
-                        list.Add((reader.GetInt32(0), reader.GetInt32(1)));
+                        string stackName = reader.GetString(0);
+                        int month = reader.GetInt32(1);
+                        int count = reader.GetInt32(2);
+
+                        if (!result.ContainsKey(stackName))
+                        {
+                            result[stackName] = new List<int>(new int[12]);
+                        }
+                        result[stackName][month - 1] = count;
                     }
                 }
             }
-            foreach(var pair in list)
-            {
-                res[pair.Month-1] = pair.Count;
-            }
-            return res;
+            return result;
         }
     }
 }

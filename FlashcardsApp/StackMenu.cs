@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using FlashcardsApp.DTOs;
 using FlashcardsApp.Models;
 using FlashcardsApp.Repositories;
 using FlashcardsApp.Utilities;
+using Microsoft.Data.SqlClient;
 
 namespace FlashcardsApp
 {
@@ -60,11 +61,20 @@ namespace FlashcardsApp
                     continue;
                 }
 
+                bool handled = false;
                 while (!int.TryParse(inp, out c) || c < 0 || c > list.Count)
                 {
+                    if (inp != null && (inp.Trim() == "A" || inp.Trim() == "a"))
+                    {
+                        CreateNewStack();
+                        handled = true;
+                        break;
+                    }
                     Console.Write("Please enter a valid number.\nTry again:\t");
                     inp = Console.ReadLine();
                 }
+
+                if (handled) continue;
                 
                 if(c != 0)
                 {
@@ -112,6 +122,11 @@ namespace FlashcardsApp
                 }
             }
 
+            catch (SqlException ex) when (ex.Number == 2601 || ex.Number == 2627)
+            {
+                Console.WriteLine($"\nA stack with the name '{newStack.Name}' already exists. Please choose a different name.");
+            }
+
             catch (Exception e)
             {
                 Console.WriteLine($"Error occured: {e.Message}");
@@ -151,7 +166,7 @@ namespace FlashcardsApp
                 case 0:
                     return;
                 case 1:
-                    showStackFlashcard(fstack);
+                    ShowStackFlashcard(fstack);
                     return;
                 case 2:
                     editStack(fstack);
@@ -222,6 +237,11 @@ namespace FlashcardsApp
                 }
             }
 
+            catch (SqlException ex) when (ex.Number == 2601 || ex.Number == 2627)
+            {
+                Console.WriteLine($"\nA stack with the name '{newStack.Name}' already exists. Please choose a different name.");
+            }
+
             catch (Exception e)
             {
                 Console.WriteLine($"Error occured: {e.Message}");
@@ -234,7 +254,7 @@ namespace FlashcardsApp
             }
         }
         
-        public void showStackFlashcard(FStack fstack)
+        public void ShowStackFlashcard(FStack fstack)
         {
             FlashcardMenu fm = new FlashcardMenu(_flashcardRepo, fstack, _sessionRepo);
             fm.ShowFlashcard();

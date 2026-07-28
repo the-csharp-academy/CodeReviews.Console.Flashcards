@@ -1,4 +1,4 @@
-﻿using FlashcardsApp.Repositories;
+using FlashcardsApp.Repositories;
 using FlashcardsApp.Utilities;
 using System;
 using System.Text;
@@ -23,7 +23,8 @@ namespace FlashcardsApp
             Console.Clear();
             int year;
             Console.WriteLine(line);
-            Console.Write("Input a year in format YYYY:\t");
+            Console.Write("Input a year in format YYYY\n");
+            Console.WriteLine(line);
             string? inp = Console.ReadLine();
             while (!int.TryParse(inp, out year))
             {
@@ -31,26 +32,54 @@ namespace FlashcardsApp
                 inp = Console.ReadLine();
             }
 
-            var list = _sessionRepo.GetStatByMonth(year);
+            var data = _sessionRepo.GetStatByMonth(year);
             var months = new List<string>{"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"};
 
-            Console.WriteLine("\n" +$" AVERAGE PER MONTH FOR: {year} ".PadCenter(Width*11, '='));
-            Console.WriteLine("\n+" + string.Concat(Enumerable.Repeat(border, 12)));
-            Console.Write("| ");
-            foreach(var month in months)
+            int nameWidth = 10;
+            // Determine the StackName column width based on the longest stack name
+            foreach (var stackName in data.Keys)
+            {
+                if (stackName.Length + 2 > nameWidth)
+                    nameWidth = stackName.Length + 2;
+            }
+
+            string cellBorder = new string('-', Width - 2) + "+";
+            string nameBorder = new string('-', nameWidth) + "+";
+
+            Console.WriteLine("\n" + $" Average per month for: {year} ".PadCenter(nameWidth + 1 + Width * 12, '-'));
+
+            // Header row
+            Console.Write("+" + nameBorder + string.Concat(Enumerable.Repeat(cellBorder, 12)));
+            Console.Write("\n| " + "StackName".PadRight(nameWidth - 1) + "| ");
+            foreach (var month in months)
             {
                 Console.Write(month.PadCenter(Width - 4) + " | ");
             }
-            Console.WriteLine("\n+" + string.Concat(Enumerable.Repeat(border, 12)));
-            Console.Write("| ");
-            foreach (var num in list)
+
+            // Data rows
+            Console.Write("\n+" + nameBorder + string.Concat(Enumerable.Repeat(cellBorder, 12)));
+            foreach (var entry in data)
             {
-                Console.Write(num.ToString().PadCenter(Width - 4) + " | ");
+                Console.Write("\n| " + entry.Key.PadRight(nameWidth - 1) + "| ");
+                foreach (var count in entry.Value)
+                {
+                    Console.Write(count.ToString().PadCenter(Width - 4) + " | ");
+                }
+                Console.Write("\n+" + nameBorder + string.Concat(Enumerable.Repeat(cellBorder, 12)));
             }
-            Console.WriteLine("\n+" + string.Concat(Enumerable.Repeat(border, 12)));
-            Console.WriteLine("\n\n" + line + line);
-            Console.WriteLine("Press enter to continue.");
-            Console.ReadLine();
+
+            if (data.Count == 0)
+            {
+                Console.Write("\n| " + "No data".PadRight(nameWidth - 1) + "| ");
+                for (int i = 0; i < 12; i++)
+                {
+                    Console.Write("0".PadCenter(Width - 4) + " | ");
+                }
+                Console.Write("\n+" + nameBorder + string.Concat(Enumerable.Repeat(cellBorder, 12)));
+            }
+
+            Console.WriteLine("\n\nPress any key to continue");
+            Console.ReadKey();
         }
     }
 }
