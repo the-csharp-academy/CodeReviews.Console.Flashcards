@@ -1,4 +1,6 @@
-﻿namespace Flashcards
+﻿using Microsoft.Data.SqlClient;
+
+namespace Flashcards
 {
     public class Stacks
     {
@@ -39,8 +41,14 @@
                 (name) VALUES (@name) ;";
 
                 tableCmd.Parameters.AddWithValue("@name", name);
-
-                tableCmd.ExecuteNonQuery();
+                try
+                {
+                    tableCmd.ExecuteNonQuery();
+                }
+                catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
+                {
+                    Console.WriteLine("Stack with this name already exists");
+                }
             }
         }
 
@@ -62,7 +70,12 @@
                     idInput = Console.ReadLine();
                     success = int.TryParse(idInput, out input);
                 }
-
+                bool stackExists = StackExistsValidation(input);
+                if (!stackExists)
+                {
+                    Console.WriteLine($"Stack with number {input} doesn't exist.");
+                    return;
+                }
                 Console.WriteLine($"Please type new name for stack {input}");
 
                 string name = Console.ReadLine();
@@ -81,8 +94,14 @@
 
                 tableCmd.Parameters.AddWithValue("@id", input);
                 tableCmd.Parameters.AddWithValue("@name", name);
-
-                tableCmd.ExecuteNonQuery();
+                try
+                {
+                    tableCmd.ExecuteNonQuery();
+                }
+                catch (SqlException ex) when (ex.Number == 2627 || ex.Number == 2601)
+                {
+                    Console.WriteLine("Stack with this name already exists");
+                }
             }
         }
 
@@ -104,6 +123,12 @@
                     stringInput = Console.ReadLine();
                     success = int.TryParse(stringInput, out input);
                 }
+                bool stackExists = StackExistsValidation(input);
+                if (!stackExists)
+                {
+                    Console.WriteLine($"Stack with number {input} doesn't exist");
+                    return;
+                }
 
                 var tableCmd = connection.CreateCommand();
 
@@ -114,6 +139,7 @@
                 tableCmd.Parameters.AddWithValue("@id", input);
 
                 tableCmd.ExecuteNonQuery();
+                Console.WriteLine($"Stack {input} has been deleted");
             }
         }
 
@@ -136,6 +162,23 @@
                         + '.' +
                         reader["name"].ToString());
                 }
+            }
+        }
+
+        public static bool StackExistsValidation(int id)
+        {
+            using (var connection = Database.GetConnection())
+            {
+                var tableCmd = connection.CreateCommand();
+                tableCmd.CommandText =
+                    @"SELECT COUNT (id)
+                    FROM stacks
+                    WHERE id = @id";
+
+                tableCmd.Parameters.AddWithValue("@id", id);
+                object result = tableCmd.ExecuteScalar();
+                int count = Convert.ToInt32(result);
+                return count >= 1;
             }
         }
     }

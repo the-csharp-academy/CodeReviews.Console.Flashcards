@@ -39,6 +39,12 @@
                 stackIdInput = Console.ReadLine();
                 success = int.TryParse(stackIdInput, out stackId);
             }
+            bool stackExists = Stacks.StackExistsValidation(stackId);
+            if (!stackExists)
+            {
+                Console.WriteLine($"Stack with number {stackId} doesn't exist");
+                return;
+            }
             int goodAnswer = 0;
             int totalQuestions = 0;
 

@@ -40,7 +40,12 @@
                     idInput = Console.ReadLine();
                     success = int.TryParse(idInput, out input);
                 }
-
+                bool stackExists = Stacks.StackExistsValidation(input);
+                if (!stackExists)
+                {
+                    Console.WriteLine($"Stack with number {input} doesn't exist");
+                    return;
+                }
                 Console.WriteLine("Please insert question for new flashcard");
                 string question = Console.ReadLine();
                 while (string.IsNullOrWhiteSpace(question))
@@ -71,7 +76,7 @@
             }
         }
 
-        public static int ViewFlashcards()
+        public static int? ViewFlashcards()
         {
             using (var connection = Database.GetConnection())
             {
@@ -86,6 +91,12 @@
                     Console.WriteLine("Please type ID of stack that you want to view");
                     idInput = Console.ReadLine();
                     success = int.TryParse(idInput, out input);
+                }
+                bool stackExists = Stacks.StackExistsValidation(input);
+                if (!stackExists)
+                {
+                    Console.WriteLine($"Stack with number {input} doesn't exist");
+                    return null;
                 }
                 var tableCmd = connection.CreateCommand();
 
@@ -119,7 +130,11 @@
         {
             using (var connection = Database.GetConnection())
             {
-                int stackId = ViewFlashcards();
+                int? stackId = ViewFlashcards();
+                if (stackId == null)
+                {
+                    return;
+                }
                 int realFlashcardId = 0;
                 int counter = 1;
                 Console.WriteLine("Please type flashcard id that you want to delete");
@@ -172,7 +187,11 @@
         {
             using (var connection = Database.GetConnection())
             {
-                int stackId = ViewFlashcards();
+                int? stackId = ViewFlashcards();
+                if (stackId == null)
+                {
+                    return;
+                }
                 int realFlashcardId = 0;
                 int counter = 1;
                 Console.WriteLine("Please type flashcard id that you want to update");
