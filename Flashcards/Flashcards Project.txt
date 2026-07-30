@@ -1,0 +1,101 @@
+Flashcards Project
+------------------
+
+The user needs a system that manages their revision flashcards.
+
+Application Requirements
+
+We need a section that manages stacks of flashcards, a flashcards section that holds the front and back of flashcards and lastly a study section where users can test their knowledge on the flashcards in the database. All study sessions are recorded with a date and score.
+
+Each section will need a main menu where user can choose what to do the first main menu will ask the user if they want to Manage Revision Stacks,Manage Flashcards, go to the study sessions area or view previous Study Sessions.
+
+Database Setup
+
+SQLserver Is used to manage the databases which was a bit of a change but it was nice to use.
+Although I had some trouble setting it up initially.
+
+The connection string is stored in appsettings.json the same way as the Coding Tracker. The format is different for SQL Server.
+
+Server=Joel;Database=Flashcards;Integrated Security=True;TrustServerCertificate=True;
+
+Server is the name of the local SQL Server. Database is the name of the database to connect to. Integrated Security means Windows Authentication is used instead of a username and password. TrustServerCertificate is required for local development to avoid certificate errors.
+
+
+I create three methods that using dapper it was the same as the habit tracker in terms of creation however some of the syntax was different. I had three tables to create so I needed three methods to do so CreateStackTable, CreateFlashcardTable and CreateStudySessionsTable.
+
+These methods are called in main before anything else as these tables need to be created successfully before we carry out any operations.
+
+Managing Stacks
+
+Manage stacks will take you to the manage stack menu where a user can view insert update or delete a revision stack.
+
+The manage stack switch will take each user to a method created for them to use to complete a crud operation for example pressing 1 in the menu will take you to insert which will ask the user to insert a revision stack, the method will collect a name from the user and threat name will be inserted into the database as the user has typed it.
+
+This flow is the same for all crud operations, the delete method will ask for the name of the stack the user would like to delete that name will be passed into the databsecontroller method responsible for database operations and will delete the name entered from stack where the name exists.
+
+Managing Flashcards
+
+Manage Flashcards follows the same flow however we allow the user to search with id.
+
+Similar to the coding tracker rowsaffected is used as a validation check to state if a stack is found, if a stack is found that meets the condition the stack operation will be carried out if not the user will be notified that no stack was found with that name.
+
+As the management of flashcards is controlled by the stack table first we allow the user to view the stack records. We then prompt the user to Enter the ID of the stack to manage, we then set the value of stackId to the stack id the user enters after validating it.
+
+Once we have the stackId the user wants to work with we can pass that into the ViewFlashcardRecords which needs to know the stack of flashcards you would like to view listing them before you carry out your update, delete or insert operations.
+
+userinput.cs 
+all of the main menu methods are inside of userinput.cs
+UserInput.cs never talks to the database directly. Its only job is gathering and validating input, then handing clean data over to DatabaseController to do the actual work.
+
+I decided to create a static field for stackid as methods throughout the program would need it.
+It is set once when the user enters the Manage Flashcards menu or the Study Sessions area, every flashcard and study session method reads from this field afterwards, so the user never has to re-enter which stack they are working with during that session.
+
+Database Controller Methods
+
+As database controller methods need variables to work with, each databasecontroller method must have parameters that accept the variables entered into them.
+
+For example the stack methods all need to accept a string parameter because they need to insert a name, delete a stack by name and update a stack to a new name from an oldname.
+
+Parameterised Queries
+
+Like my coding tracker I adopted the use of parameterised queries instead of interpolated ones are learning the risks of using interpolated queries. Users can enter code that speaks directly to the database meaning users can enter malicious input that may be interpreted as SQL commands by the database which can result in data loss / data theft. I started using parameterised queries to eliminate that risk as SQL parameters ensure that values supplied by users are handled as literal data instead of being executed as part of the query itself.
+
+Displaying Records
+
+The get stack/ flashcard methods are created to list the data in each of our databases inside of those methods using spectre. We first access the database then create a list that queries our model we then select everything in that database to display it.
+
+We create a new instance of the table we then add columns we would like in our table.
+
+I then used a foreach loop to add rows to our table, the rows are the variables on our models, stack would add Id and Name as rows, I used AnsiConsole.Write to write out all that we collected.
+
+Dapper
+
+My PreviousSessions method as well as
+
+Dapper is also used here as well as throughout the program to simplify our database operations, in our habit tracker we used ADO.NET to create a connection, open the connection, create the command, create the command text, execute the query all before closing the query.
+
+Dapper allows us to use ONE command that does all of this, connection.Execute does all of those operations in one go saving us lots of time and allows us to write and maintain clean code, I am excited to see how entity framework simplifies this even further.
+
+Study Sessions
+
+Lastly we have the studysession section which is where I really understood the importance of the foreign key.
+
+StackId is the thread that connects all three tables, it links flashcard to stack, and it links studySessions to Stack, allowing the study area to function as a separate part of the application while still relying on data the user enters in the userinput class, the Stack table (to know which stack the user is studying) and the Flashcard table (to retrieve the cards belonging to that stack).
+
+The study session feature loops through the flashcards in the selected stack one at a time. For each card it shows the front, asks the user if they know the answer, waits for the user to press a key, then reveals the back. The user marks whether they got it right or wrong. The score increments for each correct answer. At the end the session is saved to the database with the stack Id, the current date and time, and the final score is listed.
+
+Refactoring
+
+After writing I realised that one of the requirements was to have the user search using the name of the stack rather than the id so I had to refactor some code.
+
+The study sessions part was the toughest for me but after completing that I felt confident to move forward.
+
+Thoughts 
+I enjoyed using sql server as it allows for more flexible querying of the tables, it allows you to order the data however you'd like for example
+
+USE Flashcards;
+SELECT * FROM Flashcard
+order by id desc
+
+allows you to order everything in the flashcard by ascending or descending order, grouping and where.
+it's the first time I encountered using the USE keyword.
