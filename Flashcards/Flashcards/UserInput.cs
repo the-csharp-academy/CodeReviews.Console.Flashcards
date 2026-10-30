@@ -135,6 +135,7 @@ public class Input
         DatabaseController.ViewStackRecords();
         Console.WriteLine("Enter the ID of the stack to manage or enter 0 to return: ");
         stackId = Validation.ValidateId(Console.ReadLine());
+        if (stackId == 0) return;
 
         while (stackId != 0 && !DatabaseController.StackExists(stackId))
         {
@@ -161,11 +162,8 @@ public class Input
             switch (command)
             {
                 case "0":
-                    Console.WriteLine("Goodbye\nPress Any Key to exit.");
-                    Console.ReadLine();
                     start = true;
                     break;
-                // Environment.Exit(0);
 
                 case "1":
                     DatabaseController.ViewFlashcardRecords(stackId);
@@ -207,9 +205,10 @@ public class Input
         Console.Clear();
         DatabaseController.ViewFlashcardRecords(stackId);
 
-        string delInput = Validation.GetNonEmptyInput("Please enter the ID of the record you would like to delete. ");
+        string delInput = Validation.GetNonEmptyInput("Please enter the ID of the record you would like to delete or press 0 to return. ");
 
         int finalInput = Validation.ValidateId(delInput);
+        if (stackId == 0) return;
 
         DatabaseController.DeleteFlashcard(finalInput, stackId);
     }
@@ -217,10 +216,11 @@ public class Input
     {
         Console.Clear();
         DatabaseController.ViewFlashcardRecords(stackId);
-        // pass records because the view method needs to know which stacks cards to show.
-        Console.WriteLine("Please enter the ID of the record you would like to update.");
+
+        Console.WriteLine("Please enter the ID of the record you would like to update or press 0 to return.");
 
         int updateInput = Validation.ValidateId(Console.ReadLine());
+        if (stackId == 0) return;
 
         Console.WriteLine("Please enter the front and back of your flashcard to update when prompted.\n");
 
@@ -234,6 +234,14 @@ public class Input
     {
         int score = 0;
         List<FlashcardDTO> cards = DatabaseController.GetFlashcards(stackId);
+
+        if (cards.Count == 0)
+        {
+            Console.WriteLine("This stack has no flashcards yet. Add some first.");
+            Console.WriteLine("Press any key to return.");
+            Console.ReadKey();
+            return;
+        }
 
         foreach (var card in cards)
         {
@@ -268,6 +276,7 @@ public class Input
     public static void ManageSession()
     {
 
+
         Console.Clear();
         Console.WriteLine("Welcome to the study sessions area where you will test you knowledge!\nPress any key to continue.");
         Console.ReadLine();
@@ -284,7 +293,9 @@ public class Input
         {
             DatabaseController.ViewStackRecords();
             Console.WriteLine("Please enter the ID of the stack you want to study: ");
-            stackId = Validation.ValidateId(Console.ReadLine());
+            stackId = Validation.GetExistingStackId();
+            if (stackId == 0) return;
+
             Input.StartSession();
             Console.ReadLine();
             return;

@@ -1,16 +1,16 @@
 
 public class Validation
 {
-    public static int ValidateId(string Input)
+    public static int ValidateId(string? input)
     {
 
         int result;
 
 
-        while (!int.TryParse(Input, out result) || result <= 0)
+        while (!int.TryParse(input, out result) || result < 0)
         {
             Console.WriteLine("Please enter a valid ID.");
-            Input = Console.ReadLine();
+            input = Console.ReadLine();
 
         }
 
@@ -30,7 +30,7 @@ public class Validation
         return input.Trim();
     }
 
-    private static int GetExistingStackId()
+    public static int GetExistingStackId()
     {
         Console.WriteLine("Enter the ID of the stack or enter 0 to return: ");
         int id = Validation.ValidateId(Console.ReadLine());
@@ -43,4 +43,5 @@ public class Validation
 
         return id;
     }
+
 }
