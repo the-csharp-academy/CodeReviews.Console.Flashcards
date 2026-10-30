@@ -104,9 +104,17 @@ class DatabaseController
 
         using (var connection = new SqlConnection(connectionString))
         {
-            connection.Execute("INSERT INTO Stack (Name) VALUES (@Name)", new { Name = stackInput });
+            try
+            {
+                connection.Execute("INSERT INTO Stack (Name) VALUES (@Name)", new { Name = stackInput });
+                Console.WriteLine("Stack Inserted.");
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                Console.WriteLine($"A stack called '{stackInput}' already exists.");
 
-            Console.WriteLine("Stack Inserted.\nPress any key to return to main menu.");
+            }
+            Console.WriteLine("Press enter to return to the menu.");
             Console.ReadLine();
         }
     }
@@ -235,7 +243,7 @@ class DatabaseController
 
             if (rowsAffected == 0)
             {
-                Console.WriteLine("Row not found.\nPlease try again.");
+                Console.WriteLine("Flashcard with that id not found.\nPlease try again.");
                 Console.ReadLine();
             }
             else
@@ -295,19 +303,6 @@ class DatabaseController
                 new { StackId = stackId }).ToList();
         }
     }
-
-    //     public static bool StackNameExists(string name)
-    // {
-    //     var controller = new DatabaseController();
-
-    //     using (var connection = new SqlConnection(connectionString))
-    //     {
-    //         int count = connection.ExecuteScalar<int>(
-    //             "SELECT COUNT(*) FROM Stack WHERE Name = @Name",
-    //             new { Name = name });
-    //         return count > 0;
-    //     }
-    // }
 
     public static bool StackExists(int id)
     {

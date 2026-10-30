@@ -1,7 +1,6 @@
 
 public class Validation
 {
-    // input validation logic
     public static int ValidateId(string Input)
     {
 
@@ -17,7 +16,6 @@ public class Validation
 
         return result;
     }
-
     public static string GetNonEmptyInput(string prompt)
     {
         Console.WriteLine(prompt);
@@ -32,4 +30,17 @@ public class Validation
         return input.Trim();
     }
 
+    private static int GetExistingStackId()
+    {
+        Console.WriteLine("Enter the ID of the stack or enter 0 to return: ");
+        int id = Validation.ValidateId(Console.ReadLine());
+
+        while (id != 0 && !DatabaseController.StackExists(id))
+        {
+            Console.WriteLine("No stack with that ID. Please try again or enter 0 to return: ");
+            id = Validation.ValidateId(Console.ReadLine());
+        }
+
+        return id;
+    }
 }

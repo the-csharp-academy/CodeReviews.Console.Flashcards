@@ -69,9 +69,7 @@ public class Input
             switch (command)
             {
                 case "0":
-                    Console.WriteLine("Goodbye\nPress Any Key to exit.");
-                    Console.ReadLine();
-                    GetUserInput();
+                    end = true;
                     break;
 
 
@@ -165,7 +163,7 @@ public class Input
                 case "0":
                     Console.WriteLine("Goodbye\nPress Any Key to exit.");
                     Console.ReadLine();
-                    GetUserInput();
+                    start = true;
                     break;
                 // Environment.Exit(0);
 
