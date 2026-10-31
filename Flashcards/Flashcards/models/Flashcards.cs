@@ -1,16 +1,9 @@
-public class Flashcards
+public class Flashcard
 {
-    //database operations
-
     public int Id { get; set; }
-
     public int StackId { get; set; }
-
-    public string front { get; set; }
-
-    public string back { get; set; }
-
-
+    public string Front { get; set; }
+    public string Back { get; set; }
 }
 
 

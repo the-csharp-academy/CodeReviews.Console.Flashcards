@@ -72,6 +72,15 @@ class DatabaseController
         }
     }
 
+    public static List<Flashcard> GetFlashcardsWithIds(int stackId)
+    {
+        using var connection = new SqlConnection(connectionString);
+
+        return connection.Query<Flashcard>(
+            "SELECT Id, StackId, Front, Back FROM Flashcard WHERE StackId = @StackId ORDER BY Id",
+            new { StackId = stackId }).ToList();
+    }
+
     public static void GetStackRecords()
     {
         Console.Clear();
@@ -173,23 +182,28 @@ class DatabaseController
 
         using (var connection = new SqlConnection(connectionString))
         {
-            List<FlashcardDTO> tabledata = connection.Query<FlashcardDTO>(
-            @"SELECT * FROM Flashcard WHERE StackId = @StackId", new { StackId = stackId }).ToList();
+            List<Flashcard> cards = GetFlashcardsWithIds(stackId);
 
+            // convert database models into DTOs for display, numbered from 1
+            var displayCards = new List<FlashcardDTO>();
+            for (int i = 0; i < cards.Count; i++)
+            {
+                displayCards.Add(new FlashcardDTO
+                {
+                    Id = i + 1,
+                    Front = cards[i].Front,
+                    Back = cards[i].Back
+                });
+            }
             var table = new Table();
 
             table.AddColumn("Id");
             table.AddColumn("Front");
             table.AddColumn("Back");
 
-            foreach (var card in tabledata)
+            foreach (var card in displayCards)
             {
-                table.AddRow(
-                card.Id.ToString(),
-                card.Front.ToString(),
-                card.Back.ToString()
-
-                );
+                table.AddRow(card.Id.ToString(), card.Front, card.Back);
             }
 
             AnsiConsole.Write(table);
@@ -202,10 +216,18 @@ class DatabaseController
     {
         using (var connection = new SqlConnection(connectionString))
         {
-            connection.Execute(@"INSERT INTO Flashcard (Front, Back, StackId)
+            try
+            {
+                connection.Execute(@"INSERT INTO Flashcard (Front, Back, StackId)
             VALUES (@Front, @Back, @StackId)", new { Front = front, Back = back, StackId = stackId });
 
-            Console.WriteLine("Flashcard Inserted.\nPress any key to return to main menu.");
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                Console.WriteLine($"A flashcard called '{front}' already exists.");
+            }
+
+            Console.WriteLine("Press any key to return to main menu.");
             Console.ReadKey();
 
         }
@@ -215,7 +237,7 @@ class DatabaseController
     {
         using (var connection = new SqlConnection(connectionString))
         {
-            int rowsAffected = connection.Execute("DELETE FROM Flashcard WHERE Id = @Id", new { Id = input });
+            int rowsAffected = connection.Execute("DELETE FROM Flashcard WHERE Id AND StackId = @StackId", new { Id = input });
 
             if (rowsAffected == 0)
             {
@@ -238,8 +260,8 @@ class DatabaseController
         using (var connection = new SqlConnection(connectionString))
         {
 
-            int rowsAffected = connection.Execute(@"UPDATE Flashcard SET Front = @Front, Back = @Back WHERE Id = @Id",
-            new { Id = updateId, Front = front, Back = back });
+            int rowsAffected = connection.Execute(@"UPDATE Flashcard SET Front = @Front, Back = @Back WHERE Id = @Id AND StackId = @StackId",
+            new { Id = updateId, StackId = stackId, Front = front, Back = back });
 
             if (rowsAffected == 0)
             {
