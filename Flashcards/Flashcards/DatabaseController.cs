@@ -49,9 +49,10 @@ class DatabaseController
             CREATE TABLE Flashcard (
                 Id INT PRIMARY KEY IDENTITY(1,1),
                 StackId INT NOT NULL,
-                Front NVARCHAR(100)UNIQUE,
-                Back NVARCHAR(100)UNIQUE
-                FOREIGN KEY (StackId) REFERENCES Stack(Id) ON DELETE CASCADE    
+                Front NVARCHAR(100) NOT NULL,
+                Back NVARCHAR(100) NOT NULL,
+                FOREIGN KEY (StackId) REFERENCES Stack(Id) ON DELETE CASCADE,
+                UNIQUE (StackId, Front)
             )");
         }
     }
@@ -277,7 +278,7 @@ class DatabaseController
 
     }
 
-    public static void InsertSession(int stackId, string Score)
+    public static void InsertSession(int stackId, int Score)
     {
 
         using (var connection = new SqlConnection(connectionString))

@@ -22,9 +22,9 @@ public class Input
             switch (command)
             {
                 case "0":
-                    Console.WriteLine("Goodbye\nPress Any Key to exit.");
+                    Console.WriteLine("Goodbye\nPress enter to exit.");
                     Console.ReadLine();
-                    Environment.Exit(0);
+                    end = true;
                     break;
 
 
@@ -44,6 +44,11 @@ public class Input
                     DatabaseController.PreviousSessions();
                     break;
 
+                default:
+                    Console.WriteLine("Please enter a number between 0 and 4. Press Enter to try again.");
+                    Console.ReadLine();
+                    break;
+
             }
         }
     }
@@ -57,7 +62,7 @@ public class Input
             Console.Clear();
             Console.WriteLine("Welcome to the Stack system!\n");
             Console.WriteLine("What would you like to do?");
-            Console.WriteLine("Press 0 to return to the main menu.");
+            Console.WriteLine("Press 0 to return to the Main Menu.");
             Console.WriteLine("Press 1 to view all Revision Stacks.");
             Console.WriteLine("Press 2 to Insert a Revision Stack.");
             Console.WriteLine("Press 3 to Delete a Revision Stack.");
@@ -99,7 +104,7 @@ public class Input
 
     public static void InsertStackInput()
     {
-        string stackName = Validation.GetNonEmptyInput("Please enter the name of your revision stack.\nEnter 0 if you would like to return to main menu. ");
+        string stackName = Validation.GetNonEmptyInput("Please enter the name of your revision stack.\nEnter 0 if you would like to return to Main Menu. ");
         if (stackName == "0") return;
 
         DatabaseController.InsertStack(stackName);
@@ -110,7 +115,7 @@ public class Input
         Console.Clear();
         DatabaseController.ViewStackRecords();
 
-        string delStack = Validation.GetNonEmptyInput("Please enter the name of the revision stack you'd like deleted.\nEnter 0 if you would like to return to main menu.");
+        string delStack = Validation.GetNonEmptyInput("Please enter the name of the revision stack you'd like deleted.\nEnter 0 if you would like to return to Main Menu.");
         if (delStack == "0") return;
 
         DatabaseController.DeleteStackByName(delStack);
@@ -121,10 +126,10 @@ public class Input
         Console.Clear();
         DatabaseController.ViewStackRecords();
 
-        string OldName = Validation.GetNonEmptyInput("Please enter the name of the stack you would like to update.\nEnter 0 if you would like to return to main menu.");
+        string OldName = Validation.GetNonEmptyInput("Please enter the name of the stack you would like to update.\nEnter 0 if you would like to return to Main Menu.");
         if (OldName == "0") return;
 
-        string NewName = Validation.GetNonEmptyInput("Please enter the Name you would like the new stack to be.\nEnter 0 if you would like to return to main menu.");
+        string NewName = Validation.GetNonEmptyInput("Please enter the Name you would like the new stack to be.\nEnter 0 if you would like to return to Main Menu.");
         if (NewName == "0") return;
 
         DatabaseController.UpdateStackByName(OldName, NewName);
@@ -148,10 +153,12 @@ public class Input
         bool start = false;
         while (start == false)
         {
+
+            Console.Clear();
             Console.WriteLine();
             Console.WriteLine("Welcome to the Flashcard Menu!\n");
             Console.WriteLine("What would you like to do with the record?");
-            Console.WriteLine("Press 0 to return to the main menu.");
+            Console.WriteLine("Press 0 to return to the Main Menu.");
             Console.WriteLine("Press 1 to view all Revision Flashcard.");
             Console.WriteLine("Press 2 to Insert a Revision Flashcard.");
             Console.WriteLine("Press 3 to Delete a Revision Flashcard.");
@@ -234,8 +241,8 @@ public class Input
         if (cards.Count == 0)
         {
             Console.WriteLine("This stack has no flashcards yet. Add some first.");
-            Console.WriteLine("Press any key to return.");
-            Console.ReadKey();
+            Console.WriteLine("Press enter to return.");
+            Console.ReadLine();
             return;
         }
 
@@ -243,7 +250,7 @@ public class Input
         {
             Console.Clear();
             Console.WriteLine($"Front: {card.Front}");
-            Console.WriteLine("\nPress any key to see the answer...");
+            Console.WriteLine("\nPress enter to see the answer...");
             Console.ReadLine();
 
 
@@ -260,10 +267,10 @@ public class Input
             if (answer == "y") score++;
 
         }
-        Console.WriteLine($"\nSession complete! You scored {score}");
-        Console.ReadKey();
+        Console.WriteLine($"\nSession complete! You scored {score}\nPress enter to return to the Main Menu");
+        Console.ReadLine();
 
-        DatabaseController.InsertSession(stackId, $"{score}");
+        DatabaseController.InsertSession(stackId, score);
 
     }
 
@@ -290,16 +297,10 @@ public class Input
 
 
         Console.Clear();
-        Console.WriteLine("Welcome to the study sessions area where you will test you knowledge!\nPress any key to continue.");
+        Console.WriteLine("Welcome to the study sessions area where you will test you knowledge!\nPress enter to continue.");
         Console.ReadLine();
         Console.WriteLine("\nAre you ready to test your knowledge? (Y/N)");
-        string answer = Console.ReadLine().ToLower().Trim();
-
-        while (answer != "y" && answer != "n")
-        {
-            Console.WriteLine("Please enter Y or N.");
-            answer = Console.ReadLine().ToLower().Trim();
-        }
+        string answer = Validation.GetYesOrNo();
 
         if (answer == "y")
         {
@@ -312,15 +313,14 @@ public class Input
             Console.ReadLine();
             return;
         }
-
-        if (answer == "n")
+        
+        else
         {
             Console.WriteLine("Goodbye for now, come back when you're ready!");
-            Console.ReadKey();
+            Console.ReadLine();
             return;
         }
 
-        Input.StartSession();
     }
 
 }
