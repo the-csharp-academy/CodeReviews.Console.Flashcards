@@ -205,29 +205,25 @@ public class Input
         Console.Clear();
         DatabaseController.ViewFlashcardRecords(stackId);
 
-        string delInput = Validation.GetNonEmptyInput("Please enter the ID of the record you would like to delete or press 0 to return. ");
+        int realId = GetRealFlashcardId("Enter the Id of the flashcard to delete, or 0 to return:");
+        if (realId == 0) return;
 
-        int finalInput = Validation.ValidateId(delInput);
-        if (stackId == 0) return;
-
-        DatabaseController.DeleteFlashcard(finalInput, stackId);
+        DatabaseController.DeleteFlashcard(realId, stackId);
     }
+
     public static void UpdateFlashcardInput()
     {
         Console.Clear();
         DatabaseController.ViewFlashcardRecords(stackId);
 
-        Console.WriteLine("Please enter the ID of the record you would like to update or press 0 to return.");
-
-        int updateInput = Validation.ValidateId(Console.ReadLine());
-        if (stackId == 0) return;
-
+        int realId = GetRealFlashcardId("Enter the Id of the flashcard to update, or 0 to return:");
+        if (realId == 0) return;
         Console.WriteLine("Please enter the front and back of your flashcard to update when prompted.\n");
 
         string front = Validation.GetNonEmptyInput("Front: ");
         string back = Validation.GetNonEmptyInput("Back: ");
 
-        DatabaseController.UpdateFlashcard(updateInput, stackId, front, back);
+        DatabaseController.UpdateFlashcard(realId, stackId, front, back);
     }
 
     public static void StartSession()
@@ -271,7 +267,23 @@ public class Input
 
     }
 
+    private static int GetRealFlashcardId(string prompt)
+    {
+        List<Flashcard> cards = DatabaseController.GetFlashcardsWithIds(stackId);
 
+        Console.WriteLine(prompt);
+        int number = Validation.ValidateId(Console.ReadLine());
+
+        while (number > cards.Count)
+        {
+            Console.WriteLine($"There are only {cards.Count} flashcards. Try again or enter 0 to return:");
+            number = Validation.ValidateId(Console.ReadLine());
+        }
+
+        if (number == 0) return 0;
+
+        return cards[number - 1].Id;
+    }
 
     public static void ManageSession()
     {

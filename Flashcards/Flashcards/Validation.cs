@@ -16,6 +16,7 @@ public class Validation
 
         return result;
     }
+
     public static string GetNonEmptyInput(string prompt)
     {
         Console.WriteLine(prompt);
@@ -43,5 +44,25 @@ public class Validation
 
         return id;
     }
+
+    // private static int GetRealFlashcardId(string prompt)
+    // {
+    //     List<Flashcard> cards = DatabaseController.GetFlashcardsWithIds(stackId);
+
+    //     Console.WriteLine(prompt);
+    //     int number = Validation.ValidateId(Console.ReadLine());
+
+    //     while (number > cards.Count)
+    //     {
+    //         Console.WriteLine($"There are only {cards.Count} flashcards. Try again or enter 0 to return:");
+    //         number = Validation.ValidateId(Console.ReadLine());
+    //     }
+
+    //     if (number == 0) return 0;
+
+    //     return cards[number - 1].Id;
+    // }
+
+
 
 }
