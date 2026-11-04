@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Dapper;
 using Spectre.Console;
 
-
 class DatabaseController
 {
     static string connectionString = new ConfigurationBuilder()
@@ -172,8 +171,6 @@ class DatabaseController
 
         }
         Console.ReadKey();
-
-
     }
 
 
@@ -211,7 +208,6 @@ class DatabaseController
         }
 
     }
-
 
     public static void InsertFlashcard(string front, string back, int stackId)
     {
@@ -253,7 +249,6 @@ class DatabaseController
         }
 
     }
-
 
     public static void UpdateFlashcard(int updateId, int stackId, string front, string back)
     {
@@ -337,4 +332,3 @@ class DatabaseController
     }
 
 }
-
