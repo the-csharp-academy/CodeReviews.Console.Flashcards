@@ -1,6 +1,5 @@
 ﻿class Program
 {
-    // string connectionString= 
     static void Main(string[] args)
     {
 
@@ -11,6 +10,4 @@
         Console.ReadLine();
 
     }
-
-
 }

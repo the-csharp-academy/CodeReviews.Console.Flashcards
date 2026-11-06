@@ -16,7 +16,6 @@ class DatabaseController
         GetStackRecords();
         Console.WriteLine();
         Console.ReadKey();
-
     }
 
     public static void ViewFlashcardRecords(int stackId)
@@ -24,7 +23,6 @@ class DatabaseController
         GetFlashcardRecords(stackId);
         Console.WriteLine();
         Console.ReadKey();
-
     }
     public static void CreateStackTable()
     {
@@ -160,17 +158,26 @@ class DatabaseController
     {
         using (var connection = new SqlConnection(connectionString))
         {
-            int rowsAffected = connection.Execute("UPDATE Stack SET Name = @NewName WHERE Name = @OldName",
-            new { OldName = oldName, NewName = newName });
+            try
+            {
+                int rowsAffected = connection.Execute("UPDATE Stack SET Name = @NewName WHERE Name = @OldName",
+                new { OldName = oldName, NewName = newName });
 
-            if (rowsAffected == 0)
-                Console.WriteLine("No stack found with that name.");
-            else
-                Console.WriteLine("Stack Updated.");
-            Console.ReadKey();
+                if (rowsAffected == 0)
+                    Console.WriteLine("No stack found with that name.");
+                else
+                    Console.WriteLine("Stack Updated.");
+            }
+            catch (SqlException ex) when (ex.Number == 2627)
+            {
+                Console.WriteLine($"A stack called '{newName}' already exists.");
 
+            }
+
+            Console.WriteLine("Press enter key to return.");
+            Console.ReadLine();
         }
-        Console.ReadKey();
+
     }
 
 
@@ -217,15 +224,15 @@ class DatabaseController
             {
                 connection.Execute(@"INSERT INTO Flashcard (Front, Back, StackId)
             VALUES (@Front, @Back, @StackId)", new { Front = front, Back = back, StackId = stackId });
+            Console.WriteLine("Flashcard added.");
 
             }
             catch (SqlException ex) when (ex.Number == 2627)
             {
                 Console.WriteLine($"A flashcard called '{front}' already exists.");
             }
-
-            Console.WriteLine("Press any key to return to main menu.");
-            Console.ReadKey();
+            Console.WriteLine("Press enter to return.");
+            Console.ReadLine();
 
         }
     }
@@ -234,7 +241,7 @@ class DatabaseController
     {
         using (var connection = new SqlConnection(connectionString))
         {
-            int rowsAffected = connection.Execute("DELETE FROM Flashcard WHERE Id AND StackId = @StackId", new { Id = input });
+            int rowsAffected = connection.Execute("DELETE FROM Flashcard WHERE Id = @Id AND StackId = @StackId", new { Id = input, StackId = stackId });
 
             if (rowsAffected == 0)
             {
@@ -255,20 +262,24 @@ class DatabaseController
 
         using (var connection = new SqlConnection(connectionString))
         {
-
-            int rowsAffected = connection.Execute(@"UPDATE Flashcard SET Front = @Front, Back = @Back WHERE Id = @Id AND StackId = @StackId",
-            new { Id = updateId, StackId = stackId, Front = front, Back = back });
-
-            if (rowsAffected == 0)
+            try
             {
-                Console.WriteLine("Flashcard with that id not found.\nPlease try again.");
-                Console.ReadLine();
+                int rowsAffected = connection.Execute(@"UPDATE Flashcard SET Front = @Front, Back = @Back WHERE Id = @Id AND StackId = @StackId",
+                new { Id = updateId, StackId = stackId, Front = front, Back = back });
+                if (rowsAffected == 0)
+                    Console.WriteLine("Flashcard not found.");
+                else
+                    Console.WriteLine("Flashcard updated.");
             }
-            else
+
+            catch (SqlException ex) when (ex.Number == 2627)
             {
-                Console.WriteLine("Flashcard Updated.\nPress any key to return to main menu.");
-                Console.ReadKey();
+                Console.WriteLine($"A flashcard with the front '{front}' already exists in this stack.");
             }
+
+            Console.WriteLine("Press enter to return.");
+            Console.ReadLine();
+
         }
 
     }

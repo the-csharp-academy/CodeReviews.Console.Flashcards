@@ -7,6 +7,7 @@ public class Input
         bool end = false;
         while (end == false)
         {
+            Console.Clear();
             Console.WriteLine("Welcome to the Flashcard Revision system!\n");
             Console.WriteLine("Please choose an option!\n");
             Console.WriteLine("Press 0 to close the console.");
@@ -15,15 +16,12 @@ public class Input
             Console.WriteLine("Press 3 to go to the study sessions area.");
             Console.WriteLine("Press 4 to view previous Study Sessions.");
 
-
             string command = Console.ReadLine();
-
 
             switch (command)
             {
                 case "0":
                     Console.WriteLine("Goodbye\nPress enter to exit.");
-                    Console.ReadLine();
                     end = true;
                     break;
 
@@ -95,7 +93,8 @@ public class Input
                     break;
 
                 default:
-                    Console.WriteLine("Please enter e value between 1 & 4");
+                    Console.WriteLine("Please enter a value between 1 & 4");
+                    Console.ReadLine();
                     break;
 
             }
@@ -137,17 +136,9 @@ public class Input
     public static void ManageFlashcards()
     {
 
-        DatabaseController.ViewStackRecords();
+        DatabaseController.GetStackRecords();
         Console.WriteLine("Enter the ID of the stack to manage or enter 0 to return: ");
-        stackId = Validation.ValidateId(Console.ReadLine());
-        if (stackId == 0) return;
-
-        while (stackId != 0 && !DatabaseController.StackExists(stackId))
-        {
-            Console.WriteLine("No stack with that ID. Please try again or enter 0 to return: ");
-            stackId = Validation.ValidateId(Console.ReadLine());
-        }
-
+        stackId = Validation.GetExistingStackId();
         if (stackId == 0) return;
 
         bool start = false;
@@ -190,6 +181,7 @@ public class Input
 
                 default:
                     Console.WriteLine("Please enter a value between 1 & 4");
+                    Console.ReadLine();
                     break;
             }
 
@@ -257,13 +249,7 @@ public class Input
             Console.WriteLine($"Back: {card.Back}");
             Console.WriteLine("\nDid you get it right? (Y/N)");
 
-            string answer = Console.ReadLine().ToLower().Trim();
-            while (answer != "y" && answer != "n")
-            {
-                Console.WriteLine("Please enter Y or N.");
-                answer = Console.ReadLine().ToLower().Trim();
-            }
-
+            string answer = Validation.GetYesOrNo();
             if (answer == "y") score++;
 
         }
@@ -304,27 +290,19 @@ public class Input
 
         if (answer == "y")
         {
-            DatabaseController.ViewStackRecords();
-            Console.WriteLine("Please enter the ID of the stack you want to study: ");
+            DatabaseController.GetStackRecords();
             stackId = Validation.GetExistingStackId();
             if (stackId == 0) return;
 
             Input.StartSession();
-            Console.ReadLine();
             return;
         }
-        
+
         else
         {
             Console.WriteLine("Goodbye for now, come back when you're ready!");
             Console.ReadLine();
             return;
         }
-
     }
-
 }
-
-
-
-
