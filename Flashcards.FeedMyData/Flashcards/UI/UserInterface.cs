@@ -123,41 +123,18 @@ internal class UserInterface
     {
         while (true)
         {
-            // AnsiConsole.MarkupLine("[green]New [bold]FLASHCARD[/][/]");
-            // AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine("[yellow]View [bold]STACKS[/][/]");
+            AnsiConsole.WriteLine();
 
-            // // Display an "empy" stack if the user needs a new one
-            // Stack newStack = new(-1, "_New Stack");
-            // List<Stack> stacks = _database.QueryAllFromStacks();
-            // stacks.Add(newStack);
-            // stacks.Sort();
+            List<Stack> stacks = _database.QueryAllFromStacks();
+            stacks.Sort();
 
-            // var stack = ChoicesPrompt.Select(stacks, "Choose a stack", "green");
-            // if (stack.StackId == -1)
-            // {
-            //     AddStack();
-            //     stack = _database.QueryNewestStack();
-            // }
-            // AnsiConsole.MarkupLine($"Choosen stack: {stack.Name}");
-
-            // var recto = AnsiConsole.Ask<string>("Add a recto :");
-            // var verso = AnsiConsole.Ask<string>("Add a verso :");
-
-            // AnsiConsole.WriteLine();
-            // bool confirm = AnsiConsole.Confirm("Confirm and add the flashcard?");
-
-            // if (confirm)
-            // {
-            //     _database.AddFlashcard(stack.StackId, recto, verso);
-            //     Displayer.CrudSuccess("flashcard", "added");
-            // }
-            // else
-            //     Displayer.CrudDiscard("flashcard", "discarded");
-
-            // if (AnsiConsole.Confirm("Add another flashcard?"))
-            //     break;
-
-            // AnsiConsole.WriteLine();
+            foreach (Stack stack in stacks)
+            {
+                AnsiConsole.MarkupLine(stack.Name);
+            }
+            AnsiConsole.WriteLine();
+            Displayer.GoBackPressKey();
         }
     }
 
@@ -348,7 +325,7 @@ internal class UserInterface
             List<Flashcard> flashcards = FilterSelectIfNeeded("red");
             if (flashcards.Count == 0)
             {
-                Displayer.GenericError("Thre is no flaschards to delete in the selection.");
+                Displayer.GenericError("There is no flaschards to delete in the selection.");
             }
 
             var toDelete = ChoicesPrompt.SelectMulti(flashcards, "red");
