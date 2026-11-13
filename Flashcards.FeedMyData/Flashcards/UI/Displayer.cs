@@ -33,15 +33,13 @@ internal class Displayer
 
     internal static void GenericError(string message)
     {
-        AnsiConsole.MarkupLine($"[red]{message}[/]");
-        AnsiConsole.MarkupLine($"[grey]Press any key to go back to the Main Menu.[/]");
-        Console.ReadKey();
+        AnsiConsole.MarkupLine($"[Orange1]{message}[/]");
+        GoBackPressKey();
     }
 
-    internal static void FlashcardNeedStackError()
+    internal static void GoBackPressKey()
     {
-        AnsiConsole.MarkupLine("[Orange1]Operation aborpted: a flashcard need a stack.[/]");
-        AnsiConsole.MarkupLine("[grey]Press any key to go back to the previous menu.[/]");
+        AnsiConsole.MarkupLine($"[grey]Press any key to go back to the previous Menu.[/]");
         Console.ReadKey();
     }
 

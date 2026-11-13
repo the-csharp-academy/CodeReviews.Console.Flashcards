@@ -40,10 +40,10 @@ internal class UserInterface
                         Displayer.GenericError("Not implemented.");
                         break;
                     case Enums.MenuChoice.manageFlashcards:
-                        CrudMenu("Flashcard", viewFlashcard, AddFlashcard, EditFlashcard, DeleteFlashcard);
+                        CrudMenuSelector(Enums.ObjectType.flashcard);
                         break;
                     case Enums.MenuChoice.manageStacks:
-                        CrudMenu("Stack", viewStack, AddStack, EditStack, DeleteStack);
+                        CrudMenuSelector(Enums.ObjectType.stack);
                         break;
                     case Enums.MenuChoice.exit:
                         return;
@@ -57,35 +57,41 @@ internal class UserInterface
         }
     }
 
-    private void CrudMenu(string itemType, Action viewItem, Action addItem, Action editItem, Action deleteItem)
+    private void CrudMenuSelector(Enums.ObjectType type)
     {
         while (true)
         {
             Displayer.CleanConsole();
 
-            var selection = AnsiConsole.Prompt(
-                new SelectionPrompt<Enums.CrudChoice>()
-                .Title($"[yellow]Manage {itemType}[/]")
-                .HighlightStyle(Color.Yellow)
-                .UseConverter(choice => choice.GetDisplayName())
-                .AddChoices(Enum.GetValues<Enums.CrudChoice>()));
+            bool isFlashcard = type == Enums.ObjectType.flashcard;
+            bool hasItems = isFlashcard
+                ? _database.QueryOneFlashcard() is not null
+                : _database.QueryOneStack() is not null;
+
+            var choices = hasItems
+                ? Enum.GetValues<Enums.CrudChoice>()
+                : new[] { Enums.CrudChoice.addItem, Enums.CrudChoice.mainMenu };
+
+            var selection = ChoicesPrompt.PromptCrudMenu(
+                isFlashcard ? "FLASHCARDS" : "STACKS",
+                choices);
 
             switch (selection)
             {
-                case Enums.CrudChoice.viewItem:
-                    viewFlashcard();
-                    break;
-                case Enums.CrudChoice.addItem:
-                    addItem();
-                    break;
-                case Enums.CrudChoice.editItem:
-                    editItem();
-                    break;
-                case Enums.CrudChoice.deleteItem:
-                    deleteItem();
-                    break;
                 case Enums.CrudChoice.mainMenu:
                     return;
+                case Enums.CrudChoice.viewItem:
+                    if (isFlashcard) viewFlashcard(); else viewStack();
+                    break;
+                case Enums.CrudChoice.addItem:
+                    if (isFlashcard) AddFlashcard(); else AddStack();
+                    break;
+                case Enums.CrudChoice.editItem:
+                    if (isFlashcard) EditFlashcard(); else EditStack();
+                    break;
+                case Enums.CrudChoice.deleteItem:
+                    if (isFlashcard) DeleteFlashcard(); else DeleteStack();
+                    break;
             }
         }
     }
@@ -177,7 +183,7 @@ internal class UserInterface
             {
                 if (!AddStackOnce())
                 {
-                    Displayer.FlashcardNeedStackError();
+                    Displayer.GenericError("Operation aborpted: a flashcard need a stack.");
                     break;
                 }
 
@@ -260,6 +266,12 @@ internal class UserInterface
             AnsiConsole.MarkupLine("[blue]Edit [bold]FLASHCARD[/][/]");
             AnsiConsole.WriteLine();
             List<Flashcard> flashcards = FilterSelectIfNeeded("blue");
+
+            if (flashcards.Count == 0)
+            {
+                Displayer.GenericError("The selected stack is empty.");
+            }
+
             AnsiConsole.WriteLine();
 
             var selected = ChoicesPrompt.Select(flashcards, "Choose a Flashcard", "blue");
@@ -334,6 +346,10 @@ internal class UserInterface
             AnsiConsole.MarkupLine($"[red]Delete [bold]FLASHCARDS[/][/]");
             AnsiConsole.WriteLine();
             List<Flashcard> flashcards = FilterSelectIfNeeded("red");
+            if (flashcards.Count == 0)
+            {
+                Displayer.GenericError("Thre is no flaschards to delete in the selection.");
+            }
 
             var toDelete = ChoicesPrompt.SelectMulti(flashcards, "red");
             if (toDelete.Count == 0)
@@ -388,6 +404,12 @@ internal class UserInterface
             else
                 Displayer.CrudDiscard("deletion", "canceled");
 
+            if (_database.QueryOneStack() == null)
+            {
+                Displayer.GoBackPressKey();
+                break;
+            }
+
             if (!AnsiConsole.Confirm("Delete other Stacks?"))
                 break;
 
@@ -407,6 +429,7 @@ internal class UserInterface
         if (filter)
         {
             List<Stack> stacks = _database.QueryAllFromStacks();
+            List<Stack> displayableStack;
             Stack stack = ChoicesPrompt.Select(stacks, "Choose a stack", color);
             AnsiConsole.MarkupLine($"[bold]{stack.Name}[/]");
             return _database.QueryFlashcardsFromStack(stack);
