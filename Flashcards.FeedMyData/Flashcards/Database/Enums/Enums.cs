@@ -24,16 +24,25 @@ internal class Enums
 
     internal enum CrudChoice
     {
-        [Display(Name = "[green]Add[/] an item")]
+        [Display(Name = "[yellow]View[/] items")]
+        viewItem,
+
+        [Display(Name = "[green]Add[/] items")]
         addItem,
 
-        [Display(Name = "[blue]Edit[/] an item")]
+        [Display(Name = "[blue]Edit[/] items")]
         editItem,
 
-        [Display(Name = "[red]Delete[/] an item")]
+        [Display(Name = "[red]Delete[/] items")]
         deleteItem,
 
         [Display(Name = "Go back to Main Menu")]
         mainMenu,
+    }
+
+    internal enum ObjectType
+    {
+        flashcard,
+        stack
     }
 }

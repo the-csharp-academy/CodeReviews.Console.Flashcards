@@ -1,5 +1,4 @@
 using Dapper;
-using Microsoft.VisualBasic;
 
 namespace Flashcards;
 
@@ -56,30 +55,7 @@ public sealed class Database
     {
         CreateTableStacks();
         CreateTableFlashcards();
-    }
-
-    internal void DropAll()
-    {
-        // This fails if the schema contains non-table objects. 
-        // To drop all objects (tables, views, procedures) in a schema, you must generate DROP statements for each object type
-        string dropStack = "DROP TABLE IF EXISTS flash.flashcards";
-
-        _connection.Execute(connection => connection.Execute(dropStack));
-
-        string sql = """
-            DECLARE @SchemaName NVARCHAR(128) = 'flash';
-        DECLARE @DropTables NVARCHAR(MAX) = '';
-
-        --Drop Tables
-        SELECT @DropTables += 'DROP TABLE [' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']; '
-            FROM INFORMATION_SCHEMA.TABLES
-            WHERE TABLE_SCHEMA = @SchemaName
-            AND TABLE_TYPE = 'BASE TABLE';
-
-        EXEC sp_executesql @DropTables;
-        """;
-
-        _connection.Execute(connection => connection.Execute(sql));
+        CreateTableStudies();
     }
 
     private void CreateTableStacks()
@@ -179,9 +155,49 @@ public sealed class Database
         return _connection.Execute(connection => connection.Query<Stack>(sql).ToList());
     }
 
+    internal Flashcard? QueryOneFlashcard()
+    {
+        string sql = @$"SELECT TOP (1) * FROM {flashcardsTableName}";
+        return _connection.Execute(connection => connection.QueryFirstOrDefault<Flashcard>(sql));
+    }
+
+    internal Stack? QueryOneStack()
+    {
+        string sql = @$"SELECT TOP (1) * FROM {stacksTableName}";
+        return _connection.Execute(connection => connection.QueryFirstOrDefault<Stack>(sql));
+    }
+
     internal Stack? QueryNewestStack()
     {
         string sql = @$"SELECT TOP (1) * FROM {stacksTableName} ORDER BY stackId DESC";
         return _connection.Execute(connection => connection.QueryFirstOrDefault<Stack>(sql));
+    }
+
+    // ------------------------
+    // ---- DELETE ALL---------
+    // ------------------------
+
+    private void DropAll()
+    {
+        // This fails if the schema contains non-table objects. 
+        // To drop all objects (tables, views, procedures) in a schema, you must generate DROP statements for each object type
+        string dropStack = "DROP TABLE IF EXISTS flash.flashcards";
+
+        _connection.Execute(connection => connection.Execute(dropStack));
+
+        string sql = """
+            DECLARE @SchemaName NVARCHAR(128) = 'flash';
+        DECLARE @DropTables NVARCHAR(MAX) = '';
+
+        --Drop Tables
+        SELECT @DropTables += 'DROP TABLE [' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']; '
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE TABLE_SCHEMA = @SchemaName
+            AND TABLE_TYPE = 'BASE TABLE';
+
+        EXEC sp_executesql @DropTables;
+        """;
+
+        _connection.Execute(connection => connection.Execute(sql));
     }
 }
