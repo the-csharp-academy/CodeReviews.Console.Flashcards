@@ -7,6 +7,7 @@ public sealed class Database
     private readonly DbConnectionProvider _connection;
     private const string flashcardsTableName = "flash.flashcards";
     private const string stacksTableName = "flash.stacks";
+    private const string studiesTableName = "flash.studies";
 
     public Database(DbConnectionProvider connectionProvider)
     {
@@ -87,6 +88,23 @@ public sealed class Database
         _connection.Execute(connection => connection.Execute(sql));
     }
 
+    private void CreateTableStudies()
+    {
+        string sql = """
+            IF OBJECT_ID(N'flash.studies', N'U') IS NULL
+                CREATE TABLE flash.studies (
+                    studyId INT IDENTITY(1,1) PRIMARY KEY,
+                    stackId INT NOT NULL,
+                    date DATE,
+                    score INT,
+                    FOREIGN KEY (stackId) REFERENCES flash.stacks(stackId)
+                    ON DELETE CASCADE
+                    ON UPDATE CASCADE)
+            """;
+
+        _connection.Execute(connection => connection.Execute(sql));
+    }
+
     // ------------------------
     // ---- CRUD METHODS -----
     // ------------------------
@@ -103,6 +121,13 @@ public sealed class Database
         string sql = @$"INSERT INTO {stacksTableName} (name) VALUES (@name)";
 
         _connection.Execute(connection => connection.Execute(sql, new { name }));
+    }
+
+    internal void AddStudy(Study study)
+    {
+        string sql = @$"INSERT INTO {studiesTableName} (stackId, date, score) VALUES (@stackID, @date, @score)";
+
+        _connection.Execute(connection => connection.Execute(sql, new { study.StackId, study.Date, study.Score }));
     }
 
     internal void DeleteStack(Stack stack)
