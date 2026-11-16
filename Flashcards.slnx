@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Flashcards.Test/Flashcards.Test.csproj" Id="3e04eb15-9518-44e9-9751-34a566830f56" />
+  <Project Path="Flashcards/Flashcards.csproj" />
+</Solution>
