@@ -1,0 +1,17 @@
+﻿CREATE TABLE dbo.StudySessions
+(
+	Id INT IDENTITY(1,1) NOT NULL,
+	StackId INT NOT NULL,
+	StartTime DATETIME NOT NULL, 
+	Score INT NOT NULL,
+	EndTime DATETIME NOT NULL, 
+	Duration INT NOT NULL,
+	Percentage DECIMAL(5,2) NOT NULL,
+	TotalCards INT NOT NULL,
+
+	CONSTRAINT PK_StudySessions PRIMARY KEY (Id),
+	CONSTRAINT FK_StudySessions_Stacks
+		FOREIGN KEY (StackID)
+		REFERENCES dbo.Stacks(Id)
+		ON DELETE CASCADE
+)

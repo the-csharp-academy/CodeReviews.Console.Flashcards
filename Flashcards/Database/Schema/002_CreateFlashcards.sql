@@ -1,0 +1,14 @@
+CREATE TABLE dbo.Flashcards
+(
+	Id INT IDENTITY(1, 1) NOT NULL, 
+	Front NVARCHAR(100) NOT NULL,
+	Back NVARCHAR(100) NOT NULL, 
+	StackId INT NOT NULL,
+
+	CONSTRAINT PK_Flashcards PRIMARY KEY (Id),
+
+	CONSTRAINT FK_Flashcards_Stacks
+		FOREIGN KEY (StackId)
+		REFERENCES dbo.Stacks(Id)
+		ON DELETE CASCADE
+)
