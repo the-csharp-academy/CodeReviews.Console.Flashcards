@@ -9,7 +9,7 @@ internal record StudyDto(DateTime Date, string Name, int Score, int ScoreMax)
     private int _percentage;
     internal int Percentage
     {
-        get { return Percentage; }
+        get { return _percentage; }
         private set
         {
             if (ScoreMax != 0) { _percentage = Score * 100 / ScoreMax; }
