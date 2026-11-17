@@ -266,6 +266,11 @@ internal class UserInterface
 
         Stack stack = ChooseStack("MediumPurple");
         List<Flashcard> flashcards = _database.QueryFlashcardsFromStack(stack);
+        if (flashcards.Count == 0)
+        {
+            Displayer.GenericError("The selected stack is empty.");
+            return;
+        }
 
         foreach (Flashcard f in flashcards)
         {
