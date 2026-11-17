@@ -8,14 +8,14 @@ internal class Study
   internal int StackId { get; private set; }
   internal DateTime Date { get; private set; }
   internal int Score { get; private set; }
-  internal int StackSize { get; private set; }
+  internal int ScoreMax { get; private set; }
 
-  internal Study(int studyId, int stackId, DateTime date, int score, int stackSize)
+  internal Study(int studyId, int stackId, DateTime date, int score, int scoreMax)
   {
     StudyId = studyId;
     StackId = stackId;
     Date = date;
     Score = score;
-    StackSize = stackSize;
+    ScoreMax = scoreMax;
   }
 }

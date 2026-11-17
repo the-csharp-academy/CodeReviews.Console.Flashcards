@@ -199,6 +199,12 @@ public sealed class Database
         return _connection.Execute(connection => connection.QueryFirstOrDefault<Stack>(sql));
     }
 
+    internal Study? QueryOneStudy()
+    {
+        string sql = @$"SELECT TOP (1) * FROM {studiesTableName}";
+        return _connection.Execute(connection => connection.QueryFirstOrDefault<Study>(sql));
+    }
+
     internal Stack? QueryNewestStack()
     {
         string sql = @$"SELECT TOP (1) * FROM {stacksTableName} ORDER BY stackId DESC";

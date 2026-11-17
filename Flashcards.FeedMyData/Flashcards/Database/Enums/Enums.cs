@@ -4,7 +4,7 @@ namespace Flashcards;
 
 internal class Enums
 {
-    internal enum MenuChoice
+    internal enum MainMenuChoice
     {
         [Display(Name = "[MediumPurple]Study[/]")]
         study,
@@ -43,6 +43,7 @@ internal class Enums
     internal enum ObjectType
     {
         flashcard,
-        stack
+        stack,
+        study
     }
 }

@@ -18,7 +18,7 @@ internal static class ModelsMapper
             study.Date,
             stackName,
             study.Score,
-            study.StackSize);
+            study.ScoreMax);
     }
 
     internal static List<FlaschcardDto> FlashcardToDto(List<Flashcard> flashcards)

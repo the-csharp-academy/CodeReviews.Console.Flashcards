@@ -15,7 +15,7 @@ internal class UserInterface
         _database = database;
     }
 
-    internal void MainMenu()
+    internal void MainMenuSelector()
     {
         while (true)
         {
@@ -24,30 +24,45 @@ internal class UserInterface
             if (displayCount != 1)
                 Displayer.CleanConsole();
 
+            Enums.MainMenuChoice[] choices;
+            //----
+
+            if (_database.QueryOneStack() is null)
+                choices = [Enums.MainMenuChoice.manageStacks];
+
+            else if (_database.QueryOneFlashcard() is null)
+                choices = [Enums.MainMenuChoice.manageStacks, Enums.MainMenuChoice.manageFlashcards];
+
+            else if (_database.QueryOneStudy() is null)
+                choices = [Enums.MainMenuChoice.study, Enums.MainMenuChoice.manageStacks, Enums.MainMenuChoice.manageFlashcards];
+
+            else
+                choices = Enum.GetValues<Enums.MainMenuChoice>();
+
             var selection = AnsiConsole.Prompt(
-                new SelectionPrompt<Enums.MenuChoice>()
+                new SelectionPrompt<Enums.MainMenuChoice>()
                 .Title("What do you want to do?")
-                .HighlightStyle(Color.Yellow)
+                .HighlightStyle(Color.SeaGreen1)
                 .UseConverter(choice => choice.GetDisplayName())
-                .AddChoices(Enum.GetValues<Enums.MenuChoice>()));
+                .AddChoices(choices));
 
             try
             {
                 switch (selection)
                 {
-                    case Enums.MenuChoice.study:
+                    case Enums.MainMenuChoice.study:
                         NewStudy();
                         break;
-                    case Enums.MenuChoice.studyView:
+                    case Enums.MainMenuChoice.studyView:
                         ViewStudies();
                         break;
-                    case Enums.MenuChoice.manageFlashcards:
+                    case Enums.MainMenuChoice.manageFlashcards:
                         CrudMenuSelector(Enums.ObjectType.flashcard);
                         break;
-                    case Enums.MenuChoice.manageStacks:
+                    case Enums.MainMenuChoice.manageStacks:
                         CrudMenuSelector(Enums.ObjectType.stack);
                         break;
-                    case Enums.MenuChoice.exit:
+                    case Enums.MainMenuChoice.exit:
                         return;
                 }
             }
@@ -398,6 +413,7 @@ internal class UserInterface
             if (flashcards.Count == 0)
             {
                 Displayer.GenericError("There is no flaschards to delete in the selection.");
+                break;
             }
 
             var toDelete = ChoicesPrompt.SelectMulti(flashcards, "red");
@@ -418,6 +434,12 @@ internal class UserInterface
             }
             else
                 Displayer.CrudDiscard("deletion", "canceled");
+
+            if (_database.QueryOneFlashcard() == null)
+            {
+                Displayer.GoBackPressKey();
+                break;
+            }
 
             if (!AnsiConsole.Confirm("Delete other Flashcard?"))
                 break;

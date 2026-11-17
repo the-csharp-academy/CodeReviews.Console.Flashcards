@@ -10,7 +10,7 @@ internal class Displayer
                                     @"UI\DancingFont.flf");
         var font = FigletFont.Load(path);
         Console.Clear();
-        var figlet = new FigletText("Flashcards").Color(Color.Yellow);
+        var figlet = new FigletText("Flashcards").Color(Color.SeaGreen1);
         AnsiConsole.Write(figlet);
         AnsiConsole.WriteLine();
     }
