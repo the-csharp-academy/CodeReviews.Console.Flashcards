@@ -34,6 +34,7 @@ class Program
                 FirstStartup(tcsaDatabase);
 
             else if (tableCount != 2)
+            else if (tableCount != 3)
                 ResetDatabase(tcsaDatabase);
 
             UserInterface userInterface = new(tcsaDatabase);
@@ -41,6 +42,7 @@ class Program
 
             //Testing.FlashCardList(tcsaDatabase);
 
+            userInterface.MainMenuSelector();
         }
         catch (SqlException ex)
         {
