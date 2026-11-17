@@ -229,9 +229,11 @@ public sealed class Database
     {
         // This fails if the schema contains non-table objects. 
         // To drop all objects (tables, views, procedures) in a schema, you must generate DROP statements for each object type
-        string dropStack = "DROP TABLE IF EXISTS flash.flashcards";
+        string dropFlashcards = "DROP TABLE IF EXISTS flash.flashcards";
+        _connection.Execute(connection => connection.Execute(dropFlashcards));
 
-        _connection.Execute(connection => connection.Execute(dropStack));
+        string dropStudies = "DROP TABLE IF EXISTS flash.studies";
+        _connection.Execute(connection => connection.Execute(dropStudies));
 
         string sql = """
             DECLARE @SchemaName NVARCHAR(128) = 'flash';
