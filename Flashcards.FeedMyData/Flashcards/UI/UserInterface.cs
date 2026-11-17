@@ -21,9 +21,12 @@ internal class UserInterface
             displayCount++;
             if (displayCount != 1)
                 Displayer.CleanConsole();
-
-            Enums.MainMenuChoice[] choices;
             //----
+            Enums.MainMenuChoice[] choices;
+            try
+            {
+                if (_database.QueryOneStack() is null)
+                    choices = [Enums.MainMenuChoice.manageStacks];
 
                 else if (_database.QueryOneFlashcard() is null)
                     choices = [Enums.MainMenuChoice.manageStacks, Enums.MainMenuChoice.manageFlashcards];
@@ -41,8 +44,6 @@ internal class UserInterface
                     .UseConverter(choice => choice.GetDisplayName())
                     .AddChoices(choices));
 
-            try
-            {
                 switch (selection)
                 {
                     case Enums.MainMenuChoice.study:
@@ -63,7 +64,7 @@ internal class UserInterface
             }
             catch (SqlException ex)
             {
-                AnsiConsole.MarkupLine($"[red]SqlException: {Markup.Escape(ex.Message)}[/]");
+                AnsiConsole.MarkupLine($"{ex.GetType()}: [red]{Markup.Escape(ex.Message)}[/]");
                 AnsiConsole.MarkupLine("[grey]Press any key to return to the main menu.[/]");
                 Console.ReadKey();
             }
@@ -268,7 +269,6 @@ internal class UserInterface
 
         foreach (Flashcard f in flashcards)
         {
-
             index++;
 
             Displayer.CleanConsole();
@@ -297,15 +297,17 @@ internal class UserInterface
                 return;
         }
 
+        Displayer.CleanConsole();
+        AnsiConsole.MarkupLine($"[MediumPurple]------------------------------ [bold]Final score:[/] {score}/{flashcards.Count} -----------------------------[/]");
+
         if (score == flashcards.Count && score >= 1)
         {
-            AnsiConsole.MarkupLine("------------------------------- MAX SCORE -------------------------------");
             Displayer.MaxScoreCongrats();
         }
 
         _database.AddStudy(stack.StackId, date, score, flashcards.Count);
 
-        AnsiConsole.MarkupLine("------------------------------ SESSION OVER -----------------------------");
+
         Displayer.GoBackPressKey();
     }
 
