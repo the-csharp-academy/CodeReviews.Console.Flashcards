@@ -171,7 +171,8 @@ internal class Displayer
                             AppContext.BaseDirectory,
                             @"UI\DancingFont.flf"));
 
-        var figlet = new FigletText(font, veryGoodScore[rand.Next(0, veryGoodScore.Length)]);
+        var figlet = new FigletText(font, veryGoodScore[rand.Next(0, veryGoodScore.Length)])
+                        .Color(Color.Green);
         AnsiConsole.Write(figlet);
     }
 }

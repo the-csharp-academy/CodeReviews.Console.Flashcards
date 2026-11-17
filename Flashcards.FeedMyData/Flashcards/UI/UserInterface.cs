@@ -288,12 +288,14 @@ internal class UserInterface
         }
 
         if (score == flashcards.Count && score >= 1)
+        {
+            AnsiConsole.MarkupLine("------------------------------- MAX SCORE -------------------------------");
             Displayer.MaxScoreCongrats();
+        }
 
         _database.AddStudy(stack.StackId, date, score, flashcards.Count);
 
-        AnsiConsole.Write("--------------------------------------------------");
-        AnsiConsole.MarkupLine("Study session is over.");
+        AnsiConsole.MarkupLine("------------------------------ SESSION OVER -----------------------------");
         Displayer.GoBackPressKey();
     }
 
