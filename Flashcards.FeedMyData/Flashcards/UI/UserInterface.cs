@@ -1,4 +1,6 @@
+using System.Reflection.Emit;
 using Microsoft.Data.SqlClient;
+using Microsoft.SqlServer.Server;
 using Spectre.Console;
 
 namespace Flashcards;
@@ -34,10 +36,10 @@ internal class UserInterface
                 switch (selection)
                 {
                     case Enums.MenuChoice.study:
-                        Displayer.GenericError("Not implemented.");
+                        NewStudy();
                         break;
                     case Enums.MenuChoice.studyView:
-                        Displayer.GenericError("Not implemented.");
+                        ViewStudies();
                         break;
                     case Enums.MenuChoice.manageFlashcards:
                         CrudMenuSelector(Enums.ObjectType.flashcard);
@@ -51,6 +53,7 @@ internal class UserInterface
             }
             catch (SqlException ex)
             {
+                AnsiConsole.MarkupLine($"[red]SqlException: {Markup.Escape(ex.Message)}[/]");
                 AnsiConsole.MarkupLine("[grey]Press any key to return to the main menu.[/]");
                 Console.ReadKey();
             }
@@ -136,6 +139,17 @@ internal class UserInterface
             AnsiConsole.WriteLine();
             Displayer.GoBackPressKey();
         }
+    }
+
+    void ViewStudies()
+    {
+        AnsiConsole.MarkupLine("[MediumPurple]Previous [bold]STUDIES[/][/]");
+        AnsiConsole.WriteLine();
+
+        List<StudyDto> studies = _database.QueryMergeStudiesAndStacksNoId();
+
+        Displayer.PrintTable(studies);
+        Displayer.GoBackPressKey();
     }
 
     //------------------------------------------
@@ -230,6 +244,59 @@ internal class UserInterface
             Displayer.CrudDiscard("stack", "discarded");
 
         return confirm;
+    }
+
+    void NewStudy()
+    {
+        int score = 0;
+        int index = 0;
+        DateOnly date = DateOnly.FromDateTime(DateTime.Now);
+        System.Diagnostics.Stopwatch stopwatch = new();
+
+        Stack stack = ChooseStack("MediumPurple");
+        List<Flashcard> flashcards = _database.QueryFlashcardsFromStack(stack);
+
+        foreach (Flashcard f in flashcards)
+        {
+            index++;
+
+            Displayer.CleanConsole();
+            AnsiConsole.MarkupLine("[MediumPurple]New [bold]Study[/][/]");
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine($"[MediumPurple]Question number:[/] {index}");
+            AnsiConsole.MarkupLine($"[bold]Score:[/] {score}/{flashcards.Count}");
+            AnsiConsole.WriteLine();
+
+            Displayer.PrintPanel(f.Recto, Color.MediumPurple, stack.Name);
+            Console.WriteLine();
+            string answer = AnsiConsole.Ask<string>("Your answer: ");
+
+            if (AnswerIsCorrect(answer, f.Verso))
+            {
+                score++;
+                AnsiConsole.MarkupLine($"[green]{Displayer.GoodAnswer()}[/]");
+            }
+
+            else
+                AnsiConsole.MarkupLine($"[red]{Displayer.WrongAnswer()} It was:[/] [bold]{f.Verso}[/]");
+
+
+            AnsiConsole.MarkupLine("[grey]Press any key to continue[/]");
+            Console.ReadKey();
+        }
+
+        if (score == flashcards.Count && score >= 1)
+            Displayer.MaxScoreCongrats();
+
+        _database.AddStudy(stack.StackId, date, score, flashcards.Count);
+        AnsiConsole.Write("--------------------------------------------------");
+        AnsiConsole.MarkupLine("Study session is over.");
+        Displayer.GoBackPressKey();
+    }
+
+    bool AnswerIsCorrect(string a, string b)
+    {
+        return a.ToLower().Trim() == b.ToLower().Trim();
     }
 
     //------------------------------------------
@@ -405,14 +472,20 @@ internal class UserInterface
 
         if (filter)
         {
-            List<Stack> stacks = _database.QueryAllFromStacks();
-            List<Stack> displayableStack;
-            Stack stack = ChoicesPrompt.Select(stacks, "Choose a stack", color);
+            Stack stack = ChooseStack(color);
             AnsiConsole.MarkupLine($"[bold]{stack.Name}[/]");
+
             return _database.QueryFlashcardsFromStack(stack);
         }
 
+
         else
             return _database.QueryAllFromFlashcards();
+    }
+
+    private Stack ChooseStack(string color)
+    {
+        List<Stack> stacks = _database.QueryAllFromStacks();
+        return ChoicesPrompt.Select(stacks, "Choose a stack", color);
     }
 }

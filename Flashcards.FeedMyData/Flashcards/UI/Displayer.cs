@@ -71,9 +71,107 @@ internal class Displayer
 
         foreach (var entry in flashcards)
         {
-            string[] rowData = { entry.displayId.ToString(), entry.recto, entry.verso };
+            string[] rowData = { entry.DisplayId.ToString(), entry.Recto, entry.Verso };
             TableExtensions.AddRow(table, rowData);
         }
         AnsiConsole.Write(table);
+    }
+
+    internal static void PrintTable(List<StudyDto> studies)
+    {
+        Table table = new Table()
+        .RoundedBorder()
+        .AddColumn("Date")
+        .AddColumn("Stack")
+        .AddColumn("Score")
+        .AddColumn("%");
+
+        foreach (var entry in studies)
+        {
+            string percentage;
+
+            if (entry.Percentage < 50)
+                percentage = $"[red]{entry.Percentage}%[/]";
+            else if (entry.Percentage > 85)
+                percentage = $"[green]{entry.Percentage}%[/]";
+            else
+                percentage = entry.Percentage + "%";
+
+            string[] rowData = {
+                DateOnly.FromDateTime(entry.Date).ToString(),
+                entry.Name,
+                entry.Score.ToString() + "/" + entry.ScoreMax.ToString(),
+                percentage };
+            TableExtensions.AddRow(table, rowData);
+        }
+        AnsiConsole.Write(table);
+    }
+
+    internal static void PrintPanel(string content, Color color, string title)
+    {
+        AnsiConsole.Write(
+            new Panel($"[{color}]{content}[/]")
+            { Width = 30 }
+                .Header(title, Justify.Center)
+                .RoundedBorder()
+                .BorderColor(Color.MediumPurple)
+                .Padding(2, 2));
+    }
+
+    internal static string GoodAnswer()
+    {
+        Random rand = new();
+        string[] goodAnswer = {
+            "Good!",
+            "Well done!",
+            "You got it!",
+            "Right!",
+            "Exactly.",
+            "On point.",
+            "Noice.",
+            "Yes!",
+            "Yepi Yep!",
+            "Goosebumps.",
+            "True champ."
+        };
+
+        return goodAnswer[rand.Next(0, goodAnswer.Length)];
+    }
+
+    internal static string WrongAnswer()
+    {
+        Random rand = new();
+        string[] wrongAnswer = {
+            "Almost?",
+            "Nope.",
+            "Nein.",
+            "Nononono...",
+            "You'll got it next time.",
+            "Wrong.",
+            "Plain wrong",
+            "Oups.",
+            "Maybe a typo?",
+            "It was a hard one.",
+            "Mistakes happen",
+            "Mistakes are part of life.",
+        };
+
+        return wrongAnswer[rand.Next(0, wrongAnswer.Length)];
+    }
+
+    internal static void MaxScoreCongrats()
+    {
+        Random rand = new();
+        string[] veryGoodScore = {
+            "Awesome!",
+            "Fantastic",
+            "Amazing"
+        };
+        var font = FigletFont.Load(Path.Combine(
+                            AppContext.BaseDirectory,
+                            @"UI\DancingFont.flf"));
+
+        var figlet = new FigletText(font, veryGoodScore[rand.Next(0, veryGoodScore.Length)]);
+        AnsiConsole.Write(figlet);
     }
 }

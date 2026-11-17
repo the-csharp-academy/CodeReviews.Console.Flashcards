@@ -12,6 +12,15 @@ internal static class ModelsMapper
         return new StackDto(displayId, stack.Name);
     }
 
+    internal static StudyDto StudyToDto(Study study, string stackName)
+    {
+        return new StudyDto(
+            study.Date,
+            stackName,
+            study.Score,
+            study.StackSize);
+    }
+
     internal static List<FlaschcardDto> FlashcardToDto(List<Flashcard> flashcards)
     {
         List<FlaschcardDto> flashcardDtos = new();

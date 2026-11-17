@@ -1,15 +1,10 @@
 namespace Flashcards;
 
-internal record FlaschcardDto(int displayId, string recto, string verso);
-internal record StackDto(int displayId, string name);
+internal record FlaschcardDto(int DisplayId, string Recto, string Verso);
 
-// public class FlaschcardDto
-// {
-//     string Recto {get; set;}
-//     string Verso {get; set;}
-// }
+internal record StackDto(int DisplayId, string Name);
 
-// public class StackDto
-// {
-//     string Name;
-// }
+internal record StudyDto(DateTime Date, string Name, int Score, int ScoreMax)
+{
+    internal int Percentage => Score * 100 / ScoreMax;
+}

@@ -97,6 +97,7 @@ public sealed class Database
                     stackId INT NOT NULL,
                     date DATE,
                     score INT,
+                    scoreMax INT,
                     FOREIGN KEY (stackId) REFERENCES flash.stacks(stackId)
                     ON DELETE CASCADE
                     ON UPDATE CASCADE)
@@ -123,11 +124,11 @@ public sealed class Database
         _connection.Execute(connection => connection.Execute(sql, new { name }));
     }
 
-    internal void AddStudy(Study study)
+    internal void AddStudy(int stackId, DateOnly date, int score, int scoreMax)
     {
-        string sql = @$"INSERT INTO {studiesTableName} (stackId, date, score) VALUES (@stackID, @date, @score)";
+        string sql = @$"INSERT INTO {studiesTableName} (stackId, date, score, scoreMax) VALUES (@stackId, @date, @score, @scoreMax)";
 
-        _connection.Execute(connection => connection.Execute(sql, new { study.StackId, study.Date, study.Score }));
+        _connection.Execute(connection => connection.Execute(sql, new { stackId, date, score, scoreMax }));
     }
 
     internal void DeleteStack(Stack stack)
@@ -161,6 +162,12 @@ public sealed class Database
     // ------------------------
     // ---- QUERY METHODS -----
     // ------------------------
+
+    internal List<Study> QueryAllFromStudies()
+    {
+        string sql = @$"SELECT * FROM {studiesTableName} ORDER BY date DESC";
+        return _connection.Execute(connection => connection.Query<Study>(sql).ToList());
+    }
 
     internal List<Flashcard> QueryAllFromFlashcards()
     {
@@ -198,11 +205,21 @@ public sealed class Database
         return _connection.Execute(connection => connection.QueryFirstOrDefault<Stack>(sql));
     }
 
+    internal List<StudyDto> QueryMergeStudiesAndStacksNoId()
+    {
+        string sql = @$"SELECT studies.date, stacks.name, studies.score, studies.scoreMax 
+                        FROM flash.studies
+                        LEFT JOIN flash.stacks
+                        ON flash.studies.stackId = flash.stacks.stackId
+                        ORDER BY flash.studies.date DESC";
+
+        return _connection.Execute(connection => connection.Query<StudyDto>(sql).ToList());
+    }
     // ------------------------
     // ---- DELETE ALL---------
     // ------------------------
 
-    private void DropAll()
+    internal void DropAll()
     {
         // This fails if the schema contains non-table objects. 
         // To drop all objects (tables, views, procedures) in a schema, you must generate DROP statements for each object type

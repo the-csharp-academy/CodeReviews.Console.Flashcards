@@ -6,16 +6,16 @@ internal class Enums
 {
     internal enum MenuChoice
     {
-        [Display(Name = "Study")]
+        [Display(Name = "[MediumPurple]Study[/]")]
         study,
 
-        [Display(Name = "View study sessions")]
+        [Display(Name = "[MediumPurple]View study[/] sessions")]
         studyView,
 
-        [Display(Name = "Manage Stacks")]
+        [Display(Name = "[yellow]Manage[/] Stacks")]
         manageStacks,
 
-        [Display(Name = "Manage Flashcards")]
+        [Display(Name = "[yellow]Manage[/] Flashcards")]
         manageFlashcards,
 
         [Display(Name = "Exit")]
