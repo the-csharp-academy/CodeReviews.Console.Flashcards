@@ -41,11 +41,11 @@ class Program
         }
         catch (SqlException ex)
         {
-            AnsiConsole.MarkupLine($"[red]{Markup.Escape(ex.Message)}[/]");
+            AnsiConsole.MarkupLine($"[red]SqlException: {Markup.Escape(ex.Message)}[/]");
         }
         catch (InvalidOperationException ex)
         {
-            AnsiConsole.MarkupLine($"[red]{Markup.Escape(ex.Message)}[/]");
+            AnsiConsole.MarkupLine($"[red]InvalidOperationException: {Markup.Escape(ex.Message)}[/]");
         }
 
         Console.WriteLine("Press any key to quit.");
@@ -54,7 +54,6 @@ class Program
 
     private static string GetRequiredConnectionString(IConfiguration configuration, string name)
     {
-        // ?? => if null
         return configuration.GetConnectionString(name)
                 ?? throw new InvalidOperationException($"Connection string '{name}' is missing.");
     }

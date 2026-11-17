@@ -19,21 +19,22 @@ public sealed class DbConnectionProvider
 
     internal T Execute<T>(Func<SqlConnection, T> action)
     {
-        while (true)
+        // while (true)
+        // {
+        try
         {
-            try
-            {
-                using var connection = GetConnection();
-                return action(connection);
-            }
-            catch (SqlException ex)
-            {
-                AnsiConsole.MarkupLine($"[grey]{ex.Message}[/]");
-                bool retry = AnsiConsole.Confirm("Do you want to retry?");
-
-                if (!retry)
-                    throw;
-            }
+            using var connection = GetConnection();
+            return action(connection);
         }
+        catch (SqlException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]SqlException: {ex.Message}[/]");
+            throw;
+            // bool retry = AnsiConsole.Confirm("Do you want to retry?");
+
+            // if (!retry)
+            //     throw;
+        }
+        // }
     }
 }
