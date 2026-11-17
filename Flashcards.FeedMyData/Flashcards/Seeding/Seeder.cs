@@ -29,7 +29,7 @@ internal static class Seeder
         for (int i = 0; i < countries.Count; i++)
         {
             CountriesInfo country = countries[i];
-            int diceRoll = rand.Next(1, 7);
+            int diceRoll = rand.Next(1, 20);
 
 
             if (diceRoll == 6)
