@@ -39,7 +39,7 @@ internal class Displayer
 
     internal static void GoBackPressKey()
     {
-        AnsiConsole.MarkupLine($"[grey]Press any key to go back to the previous Menu.[/]");
+        AnsiConsole.MarkupLine($"[grey]Press any key to go back.[/]");
         Console.ReadKey();
     }
 

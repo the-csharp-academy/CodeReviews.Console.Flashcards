@@ -1,6 +1,4 @@
-using System.Reflection.Emit;
 using Microsoft.Data.SqlClient;
-using Microsoft.SqlServer.Server;
 using Spectre.Console;
 
 namespace Flashcards;
@@ -27,24 +25,21 @@ internal class UserInterface
             Enums.MainMenuChoice[] choices;
             //----
 
-            if (_database.QueryOneStack() is null)
-                choices = [Enums.MainMenuChoice.manageStacks];
+                else if (_database.QueryOneFlashcard() is null)
+                    choices = [Enums.MainMenuChoice.manageStacks, Enums.MainMenuChoice.manageFlashcards];
 
-            else if (_database.QueryOneFlashcard() is null)
-                choices = [Enums.MainMenuChoice.manageStacks, Enums.MainMenuChoice.manageFlashcards];
+                else if (_database.QueryOneStudy() is null)
+                    choices = [Enums.MainMenuChoice.study, Enums.MainMenuChoice.manageStacks, Enums.MainMenuChoice.manageFlashcards];
 
-            else if (_database.QueryOneStudy() is null)
-                choices = [Enums.MainMenuChoice.study, Enums.MainMenuChoice.manageStacks, Enums.MainMenuChoice.manageFlashcards];
+                else
+                    choices = Enum.GetValues<Enums.MainMenuChoice>();
 
-            else
-                choices = Enum.GetValues<Enums.MainMenuChoice>();
-
-            var selection = AnsiConsole.Prompt(
-                new SelectionPrompt<Enums.MainMenuChoice>()
-                .Title("What do you want to do?")
-                .HighlightStyle(Color.SeaGreen1)
-                .UseConverter(choice => choice.GetDisplayName())
-                .AddChoices(choices));
+                var selection = AnsiConsole.Prompt(
+                    new SelectionPrompt<Enums.MainMenuChoice>()
+                    .Title("What do you want to do?")
+                    .HighlightStyle(Color.SeaGreen1)
+                    .UseConverter(choice => choice.GetDisplayName())
+                    .AddChoices(choices));
 
             try
             {
@@ -145,7 +140,7 @@ internal class UserInterface
             AnsiConsole.WriteLine();
 
             List<Stack> stacks = _database.QueryAllFromStacks();
-            stacks.Sort();
+            stacks.Sort((x, y) => x.Name.CompareTo(y.Name));
 
             foreach (Stack stack in stacks)
             {
@@ -334,6 +329,7 @@ internal class UserInterface
             if (flashcards.Count == 0)
             {
                 Displayer.GenericError("The selected stack is empty.");
+                break;
             }
 
             AnsiConsole.WriteLine();
@@ -348,7 +344,11 @@ internal class UserInterface
 
 
             if (dataToEdit.Count == 0)
-                return;
+            {
+                Displayer.GenericError("No data to edit.");
+                break;
+            }
+
             if (dataToEdit.Contains("recto"))
                 selected.EditRecto(AnsiConsole.Ask<string>("Enter a new recto: "));
             if (dataToEdit.Contains("verso"))
@@ -495,7 +495,6 @@ internal class UserInterface
     private List<Flashcard> FilterSelectIfNeeded(string color)
     {
         var filter = AnsiConsole.Confirm("Filter per stack?");
-        AnsiConsole.WriteLine();
 
         if (filter)
         {
