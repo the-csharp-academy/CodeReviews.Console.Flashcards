@@ -72,4 +72,15 @@ internal static class ChoicesPrompt
 
         return selection;
     }
+
+    internal static Enums.CrudChoice PromptCrudMenu(string itemType, params Enums.CrudChoice[] choices)
+    {
+        return AnsiConsole.Prompt(
+            new SelectionPrompt<Enums.CrudChoice>()
+                .Title($"[yellow]Manage {itemType}[/]")
+                .HighlightStyle(Color.Yellow)
+                .UseConverter(choice => choice.GetDisplayName())
+                .AddChoices(choices));
+    }
+
 }
