@@ -6,15 +6,8 @@ internal record StackDto(int DisplayId, string Name);
 
 internal record StudyDto(DateTime Date, string Name, int Score, int ScoreMax)
 {
-    private int _percentage;
-    internal int Percentage
-    {
-        get { return _percentage; }
-        private set
-        {
-            if (ScoreMax != 0) { _percentage = Score * 100 / ScoreMax; }
-            else { _percentage = 0; }
-        }
-    }
+    internal int Percentage => ScoreMax == 0
+        ? 0
+        : Score * 100 / ScoreMax;
 
 }
