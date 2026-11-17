@@ -258,6 +258,7 @@ internal class UserInterface
 
         foreach (Flashcard f in flashcards)
         {
+
             index++;
 
             Displayer.CleanConsole();
@@ -281,14 +282,16 @@ internal class UserInterface
                 AnsiConsole.MarkupLine($"[red]{Displayer.WrongAnswer()} It was:[/] [bold]{f.Verso}[/]");
 
 
-            AnsiConsole.MarkupLine("[grey]Press any key to continue[/]");
-            Console.ReadKey();
+            AnsiConsole.MarkupLine("[grey]Press any key to continue or Esc to exit.[/]");
+            if (Console.ReadKey(true).Key == ConsoleKey.Escape)
+                return;
         }
 
         if (score == flashcards.Count && score >= 1)
             Displayer.MaxScoreCongrats();
 
         _database.AddStudy(stack.StackId, date, score, flashcards.Count);
+
         AnsiConsole.Write("--------------------------------------------------");
         AnsiConsole.MarkupLine("Study session is over.");
         Displayer.GoBackPressKey();
