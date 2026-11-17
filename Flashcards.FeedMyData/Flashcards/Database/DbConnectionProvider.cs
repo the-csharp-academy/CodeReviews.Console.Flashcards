@@ -19,22 +19,23 @@ public sealed class DbConnectionProvider
 
     internal T Execute<T>(Func<SqlConnection, T> action)
     {
-        // while (true)
-        // {
-        try
+        while (true)
         {
             using var connection = GetConnection();
+            try
+            {
+                connection.Open();
+            }
+            // catching SQL Server being unavailable.
+            catch (SqlException ex) when (ex.ErrorCode == -2146232060)
+            {
+                AnsiConsole.MarkupLine($"[red]SQL Server is likely unavailable. Check that your server is running.[/]");
+                if (AnsiConsole.Confirm("Do you want to retry?"))
+                    continue;
+
+                throw new DatabaseAccessException("Impossible to connect.", ex);
+            }
             return action(connection);
         }
-        catch (SqlException ex)
-        {
-            AnsiConsole.MarkupLine($"[red]SqlException: {ex.Message}[/]");
-            throw;
-            // bool retry = AnsiConsole.Confirm("Do you want to retry?");
-
-            // if (!retry)
-            //     throw;
-        }
-        // }
     }
 }

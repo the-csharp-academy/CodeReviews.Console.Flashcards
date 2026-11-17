@@ -34,18 +34,24 @@ class Program
                 FirstStartup(tcsaDatabase);
 
             else if (tableCount != 3)
-                ResetDatabase(tcsaDatabase);
+                if (!ResetDatabase(tcsaDatabase))
+                    return;
+
 
             UserInterface userInterface = new(tcsaDatabase);
             userInterface.MainMenuSelector();
         }
         catch (SqlException ex)
         {
-            AnsiConsole.MarkupLine($"[red]SqlException: {Markup.Escape(ex.Message)}[/]");
+            AnsiConsole.MarkupLine($"{ex.GetType()}: [red]{Markup.Escape(ex.Message)}[/]");
         }
         catch (InvalidOperationException ex)
         {
-            AnsiConsole.MarkupLine($"[red]InvalidOperationException: {Markup.Escape(ex.Message)}[/]");
+            AnsiConsole.MarkupLine($"{ex.GetType()}: [red]{Markup.Escape(ex.Message)}[/]");
+        }
+        catch (DatabaseAccessException ex)
+        {
+            AnsiConsole.MarkupLine($"{ex.GetType()}: [red]{Markup.Escape(ex.Message)}[/]");
         }
 
         Console.WriteLine("Press any key to quit.");
@@ -79,7 +85,7 @@ class Program
         });
     }
 
-    private static void ResetDatabase(Database database)
+    private static bool ResetDatabase(Database database)
     {
         AnsiConsole.MarkupLine("[red]The database has either one or more than the two required tables.[/]");
         AnsiConsole.MarkupLine("[grey]Erase all data or inspect the database manually.[/]");
@@ -90,9 +96,10 @@ class Program
         {
             database.DropAll();
             FirstStartup(database);
+            return true;
         }
 
         else
-            throw new InvalidOperationException();
+            return false;
     }
 }
