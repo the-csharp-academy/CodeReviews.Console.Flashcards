@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Flashcards/Flashcards.csproj" />
+  <Project Path="TUnit/TUnit.csproj" />
+</Solution>
