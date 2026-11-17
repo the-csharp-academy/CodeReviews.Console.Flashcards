@@ -1,3 +1,5 @@
+using System.Dynamic;
+
 namespace Flashcards;
 
 internal class Study
@@ -6,12 +8,14 @@ internal class Study
   internal int StackId { get; private set; }
   internal DateTime Date { get; private set; }
   internal int Score { get; private set; }
+  internal int StackSize { get; private set; }
 
-  internal Study(int sutdyId, int stackId, DateTime date, int score)
+  internal Study(int studyId, int stackId, DateTime date, int score, int stackSize)
   {
-    StudyId = sutdyId;
+    StudyId = studyId;
     StackId = stackId;
     Date = date;
     Score = score;
+    StackSize = stackSize;
   }
 }
