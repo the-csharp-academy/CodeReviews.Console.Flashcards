@@ -5,13 +5,13 @@ namespace Kerem.Flashcards.UI;
 
     public class ConsoleMenu
     {
-        private readonly CreateFlashcard _createFlashcard;
-        private readonly FindAllFlashcards _findAllFlashcards;
+        private readonly CreateStack _createStack;
+        private readonly GetStackByName _getStackByName;
 
-        public ConsoleMenu(CreateFlashcard createFlashcard, FindAllFlashcards findAllFlashcards)
+        public ConsoleMenu(CreateStack createStack,  GetStackByName getStackByName)
         {
-            _createFlashcard = createFlashcard;
-            _findAllFlashcards = findAllFlashcards;
+            _createStack = createStack;
+            _getStackByName = getStackByName;
         }
 
         public void Menu()
@@ -23,17 +23,17 @@ namespace Kerem.Flashcards.UI;
                     new SelectionPrompt<string>()
                         .Title("Please select an [bold steelblue]option[/]:")
                         .AddChoices(
-                            "1. Create a flashcard",
-                            "2. Display all flashcards",
+                            "1. Create a stack",
+                            "2. Display a stack",
                             "3. Exit"));
 
                 switch (choice[0])
                 {
                     case '1':
-                        _createFlashcard.Create();
+                        _createStack.Create();
                         break;
                     case '2':
-                        _findAllFlashcards.FindAll();
+                        _getStackByName.SelectStack();
                         break;
                     case '3':
                         AnsiConsole.MarkupLine("[bold green]Goodbye![/]");

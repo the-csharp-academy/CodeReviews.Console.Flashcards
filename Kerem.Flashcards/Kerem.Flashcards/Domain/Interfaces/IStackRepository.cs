@@ -4,5 +4,8 @@ namespace Kerem.Flashcards.Domain.Interfaces ;
 
     public interface IStackRepository
     {
-        void Create(Stack stack);
+        string Create(Stack stack);
+        bool CheckDuplicate(Stack stack);
+        Stack GetStackByName(string name);
+        List<Stack> GetAllStacks();
     }

@@ -12,9 +12,9 @@ namespace Kerem.Flashcards;
         public static IServiceCollection AddApplication(this IServiceCollection services, string connectionString)                                                                                                            
         {               
             services.AddSingleton(new DapperDbContext(connectionString));
-            services.AddSingleton<IFlashcardRepository, FlashcardRepository>();
-            services.AddSingleton<CreateFlashcard>();
-            services.AddSingleton<FindAllFlashcards>();
+            services.AddSingleton<IStackRepository, StackRepository>();
+            services.AddSingleton<CreateStack>();
+            services.AddSingleton<GetStackByName>();
             services.AddSingleton<ConsoleMenu>();
             return services;
         }   

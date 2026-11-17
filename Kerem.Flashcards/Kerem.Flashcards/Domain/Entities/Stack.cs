@@ -4,5 +4,5 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<Flashcard> Flashcards { get; } = new List<Flashcard>();
+        public ICollection<Flashcard> Flashcards { get; set; } = new List<Flashcard>();
     }
