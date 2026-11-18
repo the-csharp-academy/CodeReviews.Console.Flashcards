@@ -8,4 +8,5 @@ namespace Kerem.Flashcards.Domain.Interfaces ;
         bool CheckDuplicate(Stack stack);
         Stack GetStackByName(string name);
         List<Stack> GetAllStacks();
+        bool Delete(Stack stack);
     }

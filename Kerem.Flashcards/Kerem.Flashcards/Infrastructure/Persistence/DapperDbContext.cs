@@ -53,6 +53,11 @@ namespace Kerem.Flashcards.Infrastructure.Persistence;
                 Name NVARCHAR(255) NOT NULL,
                 StackId INT,
                 FOREIGN KEY (StackId) REFERENCES Stacks(Id) ON DELETE CASCADE);
+            CREATE TABLE StudySessions (
+                Id INT PRIMARY KEY IDENTITY(1,1),
+                DateCreated DATETIME NOT NULL,
+                StackId INT,
+                FOREIGN KEY (StackId) REFERENCES Stacks(Id)  ON DELETE CASCADE);
                 END
             """;
             connection.Execute(sql);

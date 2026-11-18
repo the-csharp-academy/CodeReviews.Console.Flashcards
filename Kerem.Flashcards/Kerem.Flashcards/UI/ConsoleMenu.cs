@@ -7,11 +7,13 @@ namespace Kerem.Flashcards.UI;
     {
         private readonly CreateStack _createStack;
         private readonly GetStackByName _getStackByName;
+        private readonly DeleteStack _deleteStack;
 
-        public ConsoleMenu(CreateStack createStack,  GetStackByName getStackByName)
+        public ConsoleMenu(CreateStack createStack,  GetStackByName getStackByName , DeleteStack deleteStack)
         {
             _createStack = createStack;
             _getStackByName = getStackByName;
+            _deleteStack = deleteStack;
         }
 
         public void Menu()
@@ -25,7 +27,11 @@ namespace Kerem.Flashcards.UI;
                         .AddChoices(
                             "1. Create a stack",
                             "2. Display a stack",
-                            "3. Exit"));
+                            "3. Display all stacks",
+                            "4  Delete a stack",
+                            "5. Start a study session",
+                            "6. Display all study sessions",
+                            "7. Exit"));
 
                 switch (choice[0])
                 {
@@ -36,6 +42,15 @@ namespace Kerem.Flashcards.UI;
                         _getStackByName.SelectStack();
                         break;
                     case '3':
+                        break;
+                    case '4':
+                        _deleteStack.Delete();
+                        break;
+                    case '5':
+                        break;
+                    case '6':
+                        break;
+                    case '7':
                         AnsiConsole.MarkupLine("[bold green]Goodbye![/]");
                         return;
                 }

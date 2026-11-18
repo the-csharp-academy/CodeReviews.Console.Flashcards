@@ -31,15 +31,19 @@ namespace Kerem.Flashcards.Features ;
 
             if (string.IsNullOrEmpty(input))
             {
-                AnsiConsole.MarkupLine("[red]Name cannot be empty");
+                AnsiConsole.MarkupLine("[red]Name cannot be empty[/]");
+                return;
             }
             var selectedStack = _repository.GetStackByName(input);
+            if (selectedStack == null)
+            {
+                AnsiConsole.MarkupLine("[red]Stack does not exist[/]");
+                return;
+            }
             Console.WriteLine(selectedStack.Name);
             foreach (var flashcard in selectedStack.Flashcards)
             {
                 Console.WriteLine(flashcard.Name);
             }
-          
-
         }
     }

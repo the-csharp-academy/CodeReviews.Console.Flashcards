@@ -2,7 +2,6 @@
 using Kerem.Flashcards.Domain.Entities;
 using Kerem.Flashcards.Domain.Interfaces;
 using Kerem.Flashcards.Infrastructure.Persistence;
-using Spectre.Console;
 
 namespace Kerem.Flashcards.Infrastructure.Repositories ;
 
@@ -22,7 +21,7 @@ namespace Kerem.Flashcards.Infrastructure.Repositories ;
             var stackSql = "INSERT INTO Stacks(Name) VALUES (@Name)";
             connection.Execute(stackSql, stack);
             var stackIdSql = "SELECT * FROM Stacks WHERE Name = (@Name)";
-            var result = connection.ExecuteScalar<int>(stackIdSql, new { Name = stack.Name });
+            var result = connection.ExecuteScalar<int>(stackIdSql, new { stack.Name });
             foreach (var flashcard in stack.Flashcards)
             {
                 flashcard.StackId = result;
@@ -36,7 +35,7 @@ namespace Kerem.Flashcards.Infrastructure.Repositories ;
         {
             var connection = _dapperDbContext.GetConnection();
             var stackName = "SELECT * FROM Stacks WHERE Name = (@Name)";
-            bool result = connection.ExecuteScalar<bool>(stackName, new { Name = stack.Name });
+            bool result = connection.ExecuteScalar<bool>(stackName, new { stack.Name });
             if (!result)
             {
                 return false;
@@ -49,6 +48,10 @@ namespace Kerem.Flashcards.Infrastructure.Repositories ;
             var connection = _dapperDbContext.GetConnection();
             var stackSql = "SELECT * FROM Stacks WHERE Name = @Name";
             var stack = connection.Query<Stack>(stackSql, new { Name = name }).FirstOrDefault();
+            if (stack == null)
+            {
+                return null;
+            }
             int stackId = stack.Id;
             var flashcard = "SELECT * FROM Flashcards WHERE StackId = @StackId";
             var result = connection.QueryMultiple(flashcard,  new { StackId = stackId });
@@ -63,5 +66,18 @@ namespace Kerem.Flashcards.Infrastructure.Repositories ;
             var stackSql = "SELECT * FROM Stacks";
             List<Stack> stacks = connection.Query<Stack>(stackSql).ToList();
             return stacks;
+        }
+
+        public bool Delete(Stack stack)
+        {
+            int id = stack.Id;
+            var connection = _dapperDbContext.GetConnection();
+            var sql = "DELETE FROM Stacks WHERE Id = @Id";
+            var isSuccess = connection.Execute(sql, new { Id = id });
+            if (isSuccess.Equals(1))
+            {
+                return true;
+            }
+            return false;
         }
     }

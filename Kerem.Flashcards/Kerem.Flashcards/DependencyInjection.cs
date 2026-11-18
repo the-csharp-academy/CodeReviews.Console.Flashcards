@@ -15,6 +15,7 @@ namespace Kerem.Flashcards;
             services.AddSingleton<IStackRepository, StackRepository>();
             services.AddSingleton<CreateStack>();
             services.AddSingleton<GetStackByName>();
+            services.AddSingleton<DeleteStack>();
             services.AddSingleton<ConsoleMenu>();
             return services;
         }   

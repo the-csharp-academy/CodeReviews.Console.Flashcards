@@ -17,7 +17,7 @@ namespace Kerem.Flashcards.Features ;
         public void Create()
         {
             Stack stack = new Stack();
-            AnsiConsole.MarkupLine("[bold steelblue]Plase enter the name of the stack[/]");
+            AnsiConsole.MarkupLine("[bold steelblue]Please enter the name of the stack[/]");
             AnsiConsole.MarkupLine("[Orange1]Enter abort to exit back to the main menu[/]");
             
             string stackName = Console.ReadLine() ?? " ";
@@ -56,7 +56,7 @@ namespace Kerem.Flashcards.Features ;
             for (int i = 0; i < amount; i++)
             {
                 Flashcard flashcard = new Flashcard();
-                AnsiConsole.MarkupLine("[bold steelblue]Plase enter the name of the flashcard[/]");
+                AnsiConsole.MarkupLine("[bold steelblue]Please enter the name of the flashcard[/]");
 
                 var flashcardName = Console.ReadLine() ?? " ";
                 
