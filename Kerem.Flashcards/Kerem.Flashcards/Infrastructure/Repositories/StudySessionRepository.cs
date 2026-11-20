@@ -12,8 +12,10 @@ namespace Kerem.Flashcards.Infrastructure.Repositories ;
             this.context = context;
         }
 
-        public void Create()
+        public void Study(StudySession studySession)
         {
-            StudySession studySession = new StudySession();
+            
         }
+        
+        
     }

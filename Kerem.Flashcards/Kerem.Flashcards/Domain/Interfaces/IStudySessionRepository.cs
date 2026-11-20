@@ -1,6 +1,8 @@
-﻿namespace Kerem.Flashcards.Domain.Interfaces ;
+﻿using Kerem.Flashcards.Domain.Entities;
+
+namespace Kerem.Flashcards.Domain.Interfaces ;
 
     public interface IStudySessionRepository
     {
-        void Create();
+        void Study(StudySession studySession);
     }

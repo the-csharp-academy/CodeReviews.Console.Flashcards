@@ -1,4 +1,5 @@
-﻿using Kerem.Flashcards.Features;
+﻿using Kerem.Flashcards.Domain.Entities;
+using Kerem.Flashcards.Features;
 using Spectre.Console;
 
 namespace Kerem.Flashcards.UI;
@@ -8,17 +9,19 @@ namespace Kerem.Flashcards.UI;
         private readonly CreateStack _createStack;
         private readonly GetStackByName _getStackByName;
         private readonly DeleteStack _deleteStack;
+        private readonly CreateStudySession _studySession;
 
-        public ConsoleMenu(CreateStack createStack,  GetStackByName getStackByName , DeleteStack deleteStack)
+        public ConsoleMenu(CreateStack createStack,  GetStackByName getStackByName , DeleteStack deleteStack, CreateStudySession studySession)
         {
             _createStack = createStack;
             _getStackByName = getStackByName;
             _deleteStack = deleteStack;
+            _studySession = studySession;
         }
 
         public void Menu()
         {
-            AnsiConsole.Write(new FigletText("Flashcard App"));
+            AnsiConsole.Write(new FigletText("LearnALang - App for learning Languages"));
             while (true)
             {
                 string choice = AnsiConsole.Prompt(
@@ -47,6 +50,7 @@ namespace Kerem.Flashcards.UI;
                         _deleteStack.Delete();
                         break;
                     case '5':
+                        _studySession.Study();
                         break;
                     case '6':
                         break;
