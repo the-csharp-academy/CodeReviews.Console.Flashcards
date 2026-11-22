@@ -48,16 +48,18 @@ namespace Kerem.Flashcards.Features ;
             int score = 0;
             foreach (var flashcard in stackSelected.Flashcards)
             {
-                Console.WriteLine(flashcard.Name.Remove(2));
+                Console.WriteLine(flashcard.Name.Remove(2) + " " + flashcard.Name.Substring(3));
                 Console.WriteLine("Please complete the word");
                 var completedWord = Console.ReadLine() ?? " ";
                 if (completedWord.Equals(flashcard.Name))
                 {
                     score++;
+                    AnsiConsole.MarkupLine($"[green]Correct![/]");
                 }
-                
-                Console.WriteLine(score);
-                    
+                if (!completedWord.Equals(flashcard.Name))
+                {
+                    AnsiConsole.MarkupLine($"[red]Incorrect[/]");
+                }
             }
             studySession.CreatedAt = DateTime.Now;
             studySession.Score = score;

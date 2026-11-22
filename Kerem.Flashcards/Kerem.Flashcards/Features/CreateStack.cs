@@ -70,6 +70,12 @@ namespace Kerem.Flashcards.Features ;
                     return;
                 }
 
+                if (flashcardName.Length < 2)
+                {
+                    AnsiConsole.MarkupLine("[red]Name cannot be less than 2 characters[/]");
+                    return;
+                }
+
                 flashcard.Name = flashcardName;
                 stack.Flashcards.Add(flashcard);
             }

@@ -49,7 +49,7 @@ namespace Kerem.Flashcards.Infrastructure.Persistence;
             PRINT 'No Table available with this name. Let us create a new table'
             CREATE TABLE Stacks (
                 Id INT PRIMARY KEY IDENTITY(1,1),
-                Name NVARCHAR(255) NOT NULL);        
+                Name NVARCHAR(255) UNIQUE NOT NULL);        
             CREATE TABLE Flashcards (
                 Id INT PRIMARY KEY IDENTITY(1,1),
                 Name NVARCHAR(255) NOT NULL,

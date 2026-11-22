@@ -15,7 +15,7 @@ namespace Kerem.Flashcards.Features ;
         public void GetAll()
         {
             var stacks = _repository.GetAllStacks();
-            if (stacks == null)
+            if (!stacks.Any())
             {
                 AnsiConsole.MarkupLine("No stacks found");
                 return;

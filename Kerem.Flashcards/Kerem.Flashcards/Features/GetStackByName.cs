@@ -30,9 +30,12 @@ namespace Kerem.Flashcards.Features ;
                 return;
             }
             Console.WriteLine(selectedStack.Name);
+            var number = 0;
             foreach (var flashcard in selectedStack.Flashcards)
             {
-                Console.WriteLine(flashcard.Name);
+                var flashcardDto = FlashcardMapper.MapToDto(flashcard);
+                number++;
+                Console.WriteLine($"{number} - {flashcardDto.Name}");
             }
         }
     }

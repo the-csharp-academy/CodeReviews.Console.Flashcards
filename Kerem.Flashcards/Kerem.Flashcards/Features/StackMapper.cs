@@ -9,7 +9,6 @@ namespace Kerem.Flashcards.Features ;
             return new StackDTO()
             {
                 Name = stack.Name,
-                Flashcards = stack.Flashcards
             };
         }
     }

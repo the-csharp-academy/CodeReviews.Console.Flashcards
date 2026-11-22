@@ -17,6 +17,11 @@ namespace Kerem.Flashcards.Features ;
         public void GetAll()
         {
             List<StudySession> studySessions = _repository.GetAllStudySessions();
+            if (!studySessions.Any())
+            {
+                AnsiConsole.MarkupLine("[red]No sessions found[/]");
+                return;
+            }
             var table = new Table();
             
             table.AddColumn("Date");
@@ -24,7 +29,7 @@ namespace Kerem.Flashcards.Features ;
             
             foreach (var session in studySessions)
             {
-                table.AddRow($"{session.CreatedAt}, {session.Score}");
+                table.AddRow(session.CreatedAt.ToString(), session.Score.ToString());
             }
             AnsiConsole.Write(table);
         }
