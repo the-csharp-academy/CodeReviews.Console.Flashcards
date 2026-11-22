@@ -28,12 +28,14 @@ namespace Kerem.Flashcards.Features ;
                 AnsiConsole.MarkupLine("[Orange1]Aborted[/]");
                 return;
             }
-
-            if (string.IsNullOrEmpty(stackName))
+            
+            var isEmpty = Validator.EmptyName(stackName);
+            if (isEmpty)
             {
                 AnsiConsole.MarkupLine("[red]Name cannot be empty[/]");
                 return;
             }
+            
             stack.Name = stackName;
             bool isDuplicate = _stackRepository.CheckDuplicate(stack);
 
@@ -43,9 +45,11 @@ namespace Kerem.Flashcards.Features ;
                 return;
             }
 
-            AnsiConsole.MarkupLine("[bold steelblue]How many flashcards to you want to crate?[/]");
+            AnsiConsole.MarkupLine("[bold steelblue]How many flashcards to you want to create?[/]");
 
-            int amount = Convert.ToInt32(Console.ReadLine() ?? "0");
+
+            var parse = int.TryParse(Console.ReadLine(), out int amount);
+
 
             if (amount <= 0)
             {

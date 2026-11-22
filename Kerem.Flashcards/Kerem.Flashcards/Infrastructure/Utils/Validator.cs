@@ -10,4 +10,14 @@
             }
             return false;
         }
+        
+        public static bool EmptyName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return true;
+            }
+            return false;
+        }
     }
+    

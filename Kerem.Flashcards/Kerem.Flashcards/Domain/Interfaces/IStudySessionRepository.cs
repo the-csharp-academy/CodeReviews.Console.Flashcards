@@ -4,5 +4,6 @@ namespace Kerem.Flashcards.Domain.Interfaces ;
 
     public interface IStudySessionRepository
     {
-        void Study(StudySession studySession);
+        string Create(StudySession studySession);
+        List<StudySession> GetAllStudySessions();
     }

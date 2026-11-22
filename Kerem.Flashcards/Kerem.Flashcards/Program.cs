@@ -14,5 +14,8 @@ var builder = new ConfigurationBuilder()
         .AddApplication(connectionString)
         .BuildServiceProvider();
     var connection = serviceProvider.GetRequiredService<DapperDbContext>().GetConnection();
+
     serviceProvider.GetRequiredService<DapperDbContext>().DbInit(connection);
+    Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
     serviceProvider.GetRequiredService<ConsoleMenu>().Menu();

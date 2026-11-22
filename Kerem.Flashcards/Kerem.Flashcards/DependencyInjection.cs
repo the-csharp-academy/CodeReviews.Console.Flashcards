@@ -13,12 +13,13 @@ namespace Kerem.Flashcards;
         {               
             services.AddSingleton(new DapperDbContext(connectionString));
             services.AddSingleton<IStackRepository, StackRepository>();
-            services.AddSingleton<IFlashcardRepository, FlashcardRepository>();
             services.AddSingleton<IStudySessionRepository, StudySessionRepository>();
             services.AddSingleton<CreateStack>();
             services.AddSingleton<GetStackByName>();
             services.AddSingleton<DeleteStack>();
             services.AddSingleton<CreateStudySession>();
+            services.AddSingleton<GetAllStudySessions>();
+            services.AddSingleton<GetAllStacks>();
             services.AddSingleton<ConsoleMenu>();
             return services;
         }   

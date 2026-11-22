@@ -24,6 +24,11 @@ namespace Kerem.Flashcards.Features ;
                 return;
             }
             var retrievedStack = _stackRepository.GetStackByName(selectedStack);
+            if (retrievedStack == null)
+            {
+                AnsiConsole.MarkupLine("[red]Stack does not exist[/]");
+                return;
+            }
             AnsiConsole.MarkupLine("[green]Are you sure you want to delete this stack? This will delete its flashcards and study sessions. Type any key to abort or y to delete[/]");
             var choice  = Console.ReadLine() ?? " ";
 
@@ -36,6 +41,7 @@ namespace Kerem.Flashcards.Features ;
             if (choice.Equals("y"))
             {
                 _stackRepository.Delete(retrievedStack);
+                AnsiConsole.MarkupLine("[green]Successfully deleted stack[/]");
             }
            
         }

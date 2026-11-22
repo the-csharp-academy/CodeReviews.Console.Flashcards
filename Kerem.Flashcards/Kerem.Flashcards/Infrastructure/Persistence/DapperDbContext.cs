@@ -23,6 +23,8 @@ namespace Kerem.Flashcards.Infrastructure.Persistence;
                 _connection = new SqlConnection(_connectionString);
                 _connection.Open();
             }
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
             return _connection;
         }
 
@@ -55,7 +57,8 @@ namespace Kerem.Flashcards.Infrastructure.Persistence;
                 FOREIGN KEY (StackId) REFERENCES Stacks(Id) ON DELETE CASCADE);
             CREATE TABLE StudySessions (
                 Id INT PRIMARY KEY IDENTITY(1,1),
-                DateCreated DATETIME NOT NULL,
+                CreatedAt DATETIME NOT NULL,
+                Score INT NOT NULL,
                 StackId INT,
                 FOREIGN KEY (StackId) REFERENCES Stacks(Id)  ON DELETE CASCADE);
                 END

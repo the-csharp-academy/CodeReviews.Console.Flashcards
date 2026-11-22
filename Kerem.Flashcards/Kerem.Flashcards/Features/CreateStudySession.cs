@@ -32,10 +32,15 @@ namespace Kerem.Flashcards.Features ;
             AnsiConsole.Write(table);
 
             var stackChoice = Console.ReadLine() ?? " ";
-
             StudySession studySession = new StudySession();
             
             var stackSelected = _stackRepository.GetStackByName(stackChoice);
+
+            if (stackSelected == null)
+            {
+                AnsiConsole.MarkupLine($"[red]Stack not found.[/]");
+                return;
+            }
             
             studySession.StackId = stackSelected.Id;
             studySession.Stack = stackSelected;
@@ -54,14 +59,9 @@ namespace Kerem.Flashcards.Features ;
                 Console.WriteLine(score);
                     
             }
-            
-            
-
-
-
-
-
-
-
+            studySession.CreatedAt = DateTime.Now;
+            studySession.Score = score;
+            string message = _repository.Create(studySession);
+            AnsiConsole.MarkupLine($"[green]{message}[/]");
         }
     }
